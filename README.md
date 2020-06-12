@@ -27,6 +27,14 @@ core.dhce.Dehazing(clip clip[, clip ref, int guide_size, int trans_size, bool po
     * Optional parameter. *Default: False*.
     * Whether to post-process.
 
+## Example
+
+| Before dehazing | After dehazing |
+| :-------------: | :------------: |
+| ![](https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg) | ![](https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg) |
+
+*The original image is from https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg.*
+
 ## License
 
 [License](https://github.com/Kiyamou/VapourSynth-DehazingCE/blob/master/LICENSE) is from original source code.
