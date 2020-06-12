@@ -348,3 +348,19 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+# Generic header file
+VapourSynth.h
+VSHelper.h
+
+# Dynamic link library after compiling
+*.dll
+
+# meson build folder
+build/
+
+# Linux build
+*.so
+
+# Other
+*.7z
