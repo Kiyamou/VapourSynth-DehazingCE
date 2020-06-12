@@ -1,0 +1,11 @@
+  The source files in ./src/ directory
+  
+  The guided filter is He et al.'s guided image filtering, and we implement in C.
+  
+  The other part will be useful but WITHOUT ANY WARRANTY; 
+  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+
+  Permission is granted for research and educational use.
+ 
+  If you want to include this software in a commercial product, please contact 
+  the author. 
