@@ -174,6 +174,10 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             TBlockSize = 16;
 
+        float TransInit = (float)(vsapi->propGetFloat(in, "trans", 0, &err));
+        if (err)
+            TransInit = 0.3f;
+
 		float gamma = (float)(vsapi->propGetFloat(in, "gamma", 0, &err));
         if (err)
             gamma = 0.7f;
@@ -182,7 +186,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             PostFlag = false;
 
-        d->dehazing_clip = new dehazing(width, height, TBlockSize, false, PostFlag, 5.f, 1.f, GBlockSize);
+        d->dehazing_clip = new dehazing(width, height, TBlockSize, TransInit, false, PostFlag, 5.f, 1.f, GBlockSize);
 
         //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
         //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()
@@ -205,6 +209,7 @@ VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegiste
     registerFunc("Dehazing",
         "src:clip;"
         "ref:clip:opt;"
+        "trans:float:opt;"
         "guide_size:int:opt;"
         "trans_size:int:opt;"
         "gamma:float:opt;"

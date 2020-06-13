@@ -8,7 +8,7 @@ Still in development, only support 8bit RGB now.
 ## Usage
 
 ```python
-core.dhce.Dehazing(clip src[, clip ref, int guide_size, int trans_size, float gamma, bool post])
+core.dhce.Dehazing(clip src[, clip ref, float trans, int trans_size, int guide_size, float gamma, bool post])
 ```
 
 * ***src***
@@ -17,12 +17,16 @@ core.dhce.Dehazing(clip src[, clip ref, int guide_size, int trans_size, float ga
     * Only support 8bit RGB now.
 * ***ref***
     * Optional parameter. *Default: src*.
-* ***guide_size***
-    * Optional parameter. *Default: 40*.
-    * Block size in guide filter.
+* ***trans***
+    * Optional parameter. *Default: 0.3*.
+    * Initial value of transmission.
+    * The larger the initial value, the stronger the effect of dehazing, but the contrast may be too high.
 * ***trans_size***
     * Optional parameter. *Default: 16*.
     * Block size in transmission estimation.
+* ***guide_size***
+    * Optional parameter. *Default: 40*.
+    * Block size in guide filter.
 * ***gamma***
     * Optional parameter. *Default: 0.7*.
     * Increase brightness to avoid image darkening after dehazing.
@@ -34,10 +38,11 @@ core.dhce.Dehazing(clip src[, clip ref, int guide_size, int trans_size, float ga
 
 | Before dehazing | After dehazing |
 | :-------------: | :------------: |
-| <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/06/13/VyeFB7EfjdXaRzv.jpg"> |
+| <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/06/13/oxBebyIunc97gOQ.jpg"> |
 | <img width="360" src="https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg"> | <img width="360" src="https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg"> |
 
-*The original image is from https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg.*
+*The first image is from original paper. (Dehazing parameters: trans=0.4, gamma=0.6)*
+*The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: trans=0.3, gamma=0.7)*
 
 ## License
 

@@ -5,7 +5,7 @@
 
 #define CLIP_TRS(x) ((x) < (0.1f) ? 0.1f : ((x) > (1.f) ? (1.f):(x)))
 
-dehazing::dehazing(int nW, int nH, int nTBlockSize, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
@@ -20,6 +20,7 @@ dehazing::dehazing(int nW, int nH, int nTBlockSize, bool bPrevFlag, bool bPosFla
 
     // block size for transmission estimation
     TBlockSize = nTBlockSize;
+    TransInit = fTransInit;
 
     // Guided filter block size, step size(sampling step), & LookUpTable parameter
     GBlockSize = nGBlockSize;
@@ -345,8 +346,8 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
 
     int nNumberofPixels = (nEndY - nStartY) * (nEndX - nStartX) * 3;
 
-    float fTrans = 0.3f;
-    int nTrans = 427;     // 427 = 128 / 0.3 // (I-A)/t + A --> ((I-A)*k*128 + A*128)/128
+    float fTrans = TransInit;
+    int nTrans = (int)(128.f / TransInit);
 
     for (auto nCounter = 0; nCounter < 7; nCounter++)
     {

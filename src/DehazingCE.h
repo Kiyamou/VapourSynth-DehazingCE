@@ -10,7 +10,7 @@
 class dehazing
 {
 public:
-    dehazing(int nW, int nH, int nTBlockSize, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
+    dehazing(int nW, int nH, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
     ~dehazing();
 
     void RemoveHaze(const uint8_t* src, const uint8_t* refpB, const uint8_t* refpG, const uint8_t* refpR, uint8_t* dst, int stride, int ref_width, int ref_height);
@@ -40,6 +40,8 @@ private:
     int GBlockSize;
     int StepSize;
     float GSigma;
+
+    float TransInit;
 
     bool m_PreviousFlag;
     bool m_PostFlag;  // Flag for post processing(deblocking)
