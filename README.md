@@ -34,7 +34,8 @@ core.dhce.Dehazing(clip src[, clip ref, int guide_size, int trans_size, float ga
 
 | Before dehazing | After dehazing |
 | :-------------: | :------------: |
-| ![](https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg) | ![](https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg) |
+| <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/06/13/VyeFB7EfjdXaRzv.jpg"> |
+| <img width="360" src="https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg"> | <img width="360" src="https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg"> |
 
 *The original image is from https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg.*
 
