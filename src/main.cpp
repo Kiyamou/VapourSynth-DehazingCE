@@ -91,6 +91,8 @@ static const VSFrameRef* VS_CC filterGetFrame(int n, int activationReason, void*
     if (activationReason == arInitial)
     {
         vsapi->requestFrameFilter(n, d->node, frameCtx);
+        if (d->rdef)
+            vsapi->requestFrameFilter(n, d->rnode, frameCtx);
     }
     else if (activationReason == arAllFramesReady)
     {
