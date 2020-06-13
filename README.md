@@ -8,21 +8,24 @@ Still in development, only support 8bit RGB now.
 ## Usage
 
 ```python
-core.dhce.Dehazing(clip clip[, clip ref, int guide_size, int trans_size, bool post])
+core.dhce.Dehazing(clip src[, clip ref, int guide_size, int trans_size, float gamma, bool post])
 ```
 
-* ***clip***
+* ***src***
     * Required parameter.
     * Clip to process.
     * Only support 8bit RGB now.
 * ***ref***
-    * Optional parameter. *Default: same with input*.
+    * Optional parameter. *Default: src*.
 * ***guide_size***
     * Optional parameter. *Default: 40*.
     * Block size in guide filter.
 * ***trans_size***
     * Optional parameter. *Default: 16*.
     * Block size in transmission estimation.
+* ***gamma***
+    * Optional parameter. *Default: 0.7*.
+    * Increase brightness to avoid image darkening after dehazing.
 * ***post***
     * Optional parameter. *Default: False*.
     * Whether to post-process.

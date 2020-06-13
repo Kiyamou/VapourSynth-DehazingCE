@@ -36,7 +36,7 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
     const T* srcpR = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 0));
     const T* srcpG = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 1));
     const T* srcpB = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 2));
-    
+
     const T* refpR = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 0));
     const T* refpG = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 1));
     const T* refpB = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 2));
@@ -130,7 +130,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
     std::unique_ptr<FilterData> d = std::make_unique<FilterData>();
     int err;
 
-    d->node = vsapi->propGetNode(in, "clip", 0, 0);
+    d->node = vsapi->propGetNode(in, "src", 0, 0);
     d->vi = vsapi->getVideoInfo(d->node);
 
     int width = d->vi->width;
@@ -142,7 +142,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
             (d->vi->format->sampleType == stInteger && d->vi->format->bitsPerSample >  16) ||
             (d->vi->format->sampleType == stFloat   && d->vi->format->bitsPerSample != 32))
             throw std::string{ "only constant format 8-16 bit integer and 32 bits float input supported" };
-        
+
         // donwscale clip for Trans Estimation
         d->rnode = vsapi->propGetNode(in, "ref", 0, &err);
 
@@ -174,15 +174,19 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             TBlockSize = 16;
 
+		float gamma = (float)(vsapi->propGetFloat(in, "gamma", 0, &err));
+        if (err)
+            gamma = 0.7f;
+
         bool PostFlag = vsapi->propGetInt(in, "post", 0, &err) == 0 ? false : true;
         if (err)
             PostFlag = false;
 
         d->dehazing_clip = new dehazing(width, height, TBlockSize, false, PostFlag, 5.f, 1.f, GBlockSize);
 
-        d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
-        d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()
-        d->dehazing_clip->GammaLUTMaker(0.7f);
+        //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
+        //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()
+        d->dehazing_clip->GammaLUTMaker(gamma);
     }
     catch (const std::string & error)
     {
@@ -199,10 +203,11 @@ VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegiste
     configFunc("com.vapoursynth.guidedFilter", "dhce", "Dehazing based on contrast enhancement", VAPOURSYNTH_API_VERSION, 1, plugin);
 
     registerFunc("Dehazing",
-        "clip:clip;"
+        "src:clip;"
         "ref:clip:opt;"
         "guide_size:int:opt;"
         "trans_size:int:opt;"
+        "gamma:float:opt;"
         "post:int:opt",
         filterCreate, 0, plugin);
 }
