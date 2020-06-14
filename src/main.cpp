@@ -206,7 +206,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
 
 VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegisterFunction registerFunc, VSPlugin* plugin)
 {
-    configFunc("com.vapoursynth.guidedFilter", "dhce", "Dehazing based on contrast enhancement", VAPOURSYNTH_API_VERSION, 1, plugin);
+    configFunc("com.vapoursynth.dehazingce", "dhce", "Dehazing based on contrast enhancement", VAPOURSYNTH_API_VERSION, 1, plugin);
 
     registerFunc("Dehazing",
         "src:clip;"
