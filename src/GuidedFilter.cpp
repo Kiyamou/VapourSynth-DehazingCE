@@ -427,7 +427,6 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
     delete[] pfSigmaEntire;
     delete[] pfB;
     delete[] pfOutB;
-    //////////////////////////////////////////////////////////////////////////
 
     delete[] pfImageR;
     delete[] pfImageG;

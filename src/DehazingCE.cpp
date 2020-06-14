@@ -110,7 +110,8 @@ void dehazing::RestoreImage(const uint8_t* src, uint8_t* dst, int width, int hei
                 // 3. Gamma correction using Lut
                 const auto pos = (j * width + i) * 3;
                 const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
-                dst[pos] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos] - fA_B) / transmission + fA_B), 0, 255)];
+
+                dst[pos]     = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, 255)];
                 dst[pos + 1] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, 255)];
                 dst[pos + 2] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, 255)];
             }
@@ -143,30 +144,35 @@ void dehazing::PostProcessing(const uint8_t* src, uint8_t* dst, int width, int h
         {
             // 1. I' = (I - Airlight) / Transmission + Airlight
             const auto pos = (j * width + i) * 3;
-            dst[pos] = (uint8_t)m_pucGammaLUT[(uint8_t)clamp((((float)src[pos] - fA_B) / clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f) + fA_B), 0.f, 255.f)];
-            dst[pos + 1] = (uint8_t)m_pucGammaLUT[(uint8_t)clamp((((float)src[pos + 1] - fA_G) / clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f) + fA_G), 0.f, 255.f)];
-            dst[pos + 2] = (uint8_t)m_pucGammaLUT[(uint8_t)clamp((((float)src[pos + 2] - fA_R) / clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f) + fA_R), 0.f, 255.f)];
+            const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f);
+
+            dst[pos]     = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, 255)];
+            dst[pos + 1] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, 255)];
+            dst[pos + 2] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, 255)];
 
             // If transmission is less than 0.4, apply post processing because more dehazed block yields more artifacts
             if (i > nDisPos + nNumStep && m_pfTransmissionR[j * width + i - nDisPos] < 0.4)
             {
-                float nAD0 = (float)(dst[j * stride + (i - nDisPos) * 3] - dst[j * stride + (i - nDisPos - 1) * 3]);
-                float nAD1 = (float)(dst[j * stride + (i - nDisPos) * 3 + 1] - dst[j * stride + (i - nDisPos - 1) * 3 + 1]);
-                float nAD2 = (float)(dst[j * stride + (i - nDisPos) * 3 + 2] - dst[j * stride + (i - nDisPos - 1) * 3 + 2]);
+                const auto posD  = (j * width + (i - nDisPos)) * 3;
+                const auto posDp = (j * width + (i - nDisPos - 1)) * 3;
+
+                float nAD0 = (float)(dst[posD]     - dst[posDp]);
+                float nAD1 = (float)(dst[posD + 1] - dst[posDp + 1]);
+                float nAD2 = (float)(dst[posD + 2] - dst[posDp + 2]);
 
                 if (std::max(std::max(abs(nAD0), abs(nAD1)), abs(nAD2)) < 20 &&
-                    abs(dst[j * stride + (i - nDisPos - 1) * 3] - dst[j * stride + (i - nDisPos - 1 - nNumStep) * 3])
-                    + abs(dst[j * stride + (i - nDisPos - 1) * 3 + 1] - dst[j * stride + (i - nDisPos - 1 - nNumStep) * 3 + 1])
-                    + abs(dst[j * stride + (i - nDisPos - 1) * 3 + 2] - dst[j * stride + (i - nDisPos - 1 - nNumStep) * 3 + 2])
-                    + abs(dst[j * stride + (i - nDisPos) * 3] - dst[j * stride + (i - nDisPos - 1 - nNumStep) * 3])
-                    + abs(dst[j * stride + (i - nDisPos) * 3 + 1] - dst[j * stride + (i - nDisPos - 1 - nNumStep) * 3 + 1])
-                    + abs(dst[j * stride + (i - nDisPos) * 3 + 2] - dst[j * stride + (i - nDisPos - 1 - nNumStep) * 3 + 2]) < 30)
+                      abs(dst[posDp]     - dst[(j * width + (i - nDisPos - 1 - nNumStep)) * 3])
+                    + abs(dst[posDp + 1] - dst[(j * width + (i - nDisPos - 1 - nNumStep)) * 3 + 1])
+                    + abs(dst[posDp + 2] - dst[(j * width + (i - nDisPos - 1 - nNumStep)) * 3 + 2])
+                    + abs(dst[posD]      - dst[(j * width + (i - nDisPos - 1 - nNumStep)) * 3])
+                    + abs(dst[posD + 1]  - dst[(j * width + (i - nDisPos - 1 - nNumStep)) * 3 + 1])
+                    + abs(dst[posD + 2]  - dst[(j * width + (i - nDisPos - 1 - nNumStep)) * 3 + 2]) < 30)
                 {
                     for (auto nS = 1; nS < nNumStep + 1; nS++)
                     {
-                        dst[j * stride + (i - nDisPos - 1 + nS - nNumStep) * 3] = (uint8_t)clamp((float)dst[j * stride + (i - nDisPos - 1 + nS - nNumStep) * 3] + (float)nS * nAD0 / (float)nNumStep, 0.f, 255.f);
-                        dst[j * stride + (i - nDisPos - 1 + nS - nNumStep) * 3 + 1] = (uint8_t)clamp((float)dst[j * stride + (i - nDisPos - 1 + nS - nNumStep) * 3 + 1] + (float)nS * nAD1 / (float)nNumStep, 0.f, 255.f);
-                        dst[j * stride + (i - nDisPos - 1 + nS - nNumStep) * 3 + 2] = (uint8_t)clamp((float)dst[j * stride + (i - nDisPos - 1 + nS - nNumStep) * 3 + 2] + (float)nS * nAD2 / (float)nNumStep, 0.f, 255.f);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     = (uint8_t)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     + (float)nS * nAD0 / (float)nNumStep, 0.f, 255.f);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] = (uint8_t)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] + (float)nS * nAD1 / (float)nNumStep, 0.f, 255.f);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] = (uint8_t)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] + (float)nS * nAD2 / (float)nNumStep, 0.f, 255.f);
                     }
                 }
             }
@@ -185,8 +191,8 @@ void dehazing::TransmissionEstimationColor(const uint8_t* pnImageR, const uint8_
             {
                 for (auto xStep = x; xStep < x + TBlockSize; xStep++)
                 {
-				    int ly = std::min(yStep, ref_height - 1);
-				    int lx = std::min(xStep, ref_width - 1);
+                    int ly = std::min(yStep, ref_height - 1);
+					int lx = std::min(xStep, ref_width - 1);
                     m_pfTransmission[ly * ref_width + lx] = fTrans;
                 }
             }
