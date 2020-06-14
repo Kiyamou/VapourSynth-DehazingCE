@@ -3,8 +3,6 @@
 #include "DehazingCE.h"
 #include "Helper.hpp"
 
-#define CLIP_TRS(x) ((x) < (0.1f) ? 0.1f : ((x) > (1.f) ? (1.f):(x)))
-
 dehazing::dehazing(int nW, int nH, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
@@ -33,163 +31,40 @@ dehazing::dehazing(int nW, int nH, int nTBlockSize, float fTransInit, bool bPrev
     BottomRightX = width;
     BottomRightY = height;
 
-    m_pfSmallTransP = new float[320 * 240];
-    m_pfSmallTrans  = new float[320 * 240];
-    m_pfSmallTransR = new float[320 * 240];
-    m_pnSmallYImg   = new int[320 * 240];
-    m_pnSmallYImgP  = new int[320 * 240];
-
-    m_pnSmallRImg   = new int[320 * 240];
-    m_pnSmallRImgP  = new int[320 * 240];
-    m_pnSmallGImg   = new int[320 * 240];
-    m_pnSmallGImgP  = new int[320 * 240];
-    m_pnSmallBImg   = new int[320 * 240];
-    m_pnSmallBImgP  = new int[320 * 240];
-
-    m_pfSmallInteg  = new float[320 * 240];
-    m_pfSmallDenom  = new float[320 * 240];
-    m_pfSmallY      = new float[320 * 240];
-
-
     m_pfTransmission  = new float[width * height];
     m_pfTransmissionR = new float[width * height];
-    m_pfTransmissionP = new float[width * height];
-    m_pnYImg          = new int[width * height];
-    m_pnYImgP         = new int[width * height];
 
     m_pnRImg = new int[width * height];
     m_pnGImg = new int[width * height];
     m_pnBImg = new int[width * height];
 
-    m_pnRImgP = new int[width * height];
-    m_pnGImgP = new int[width * height];
-    m_pnBImgP = new int[width * height];
-
-    m_pfInteg = new float[width * height];
-    m_pfDenom = new float[width * height];
-    m_pfY     = new float[width * height];
-
-
-    m_pfSmallPk_p   = new float[GBlockSize * GBlockSize];
-    m_pfSmallNormPk = new float[GBlockSize * GBlockSize];
-    m_pfPk_p        = new float[GBlockSize * GBlockSize];
-    m_pfNormPk      = new float[GBlockSize * GBlockSize];
-    m_pfGuidedLUT   = new float[GBlockSize * GBlockSize];
+    m_pfGuidedLUT = new float[GBlockSize * GBlockSize];
 }
 
 dehazing::~dehazing()
 {
-    if (m_pfSmallTransP != NULL)
-        delete[] m_pfSmallTransP;
-    if (m_pfSmallTrans != NULL)
-        delete[] m_pfSmallTrans;
-    if (m_pfSmallTransR != NULL)
-        delete[] m_pfSmallTransR;
-    if (m_pnSmallYImg != NULL)
-        delete[] m_pnSmallYImg;
-    if (m_pfSmallY != NULL)
-        delete[] m_pfSmallY;
-    if (m_pnSmallYImgP != NULL)
-        delete[] m_pnSmallYImgP;
+    if (m_pfTransmission != NULL)
+        delete[] m_pfTransmission;
+    if (m_pfTransmissionR != NULL)
+        delete[] m_pfTransmissionR;
 
-    if (m_pnSmallRImg != NULL)
-        delete[] m_pnSmallRImg;
-    if (m_pnSmallRImgP != NULL)
-        delete[] m_pnSmallRImgP;
-    if (m_pnSmallGImg != NULL)
-        delete[] m_pnSmallGImg;
-    if (m_pnSmallGImgP != NULL)
-        delete[] m_pnSmallGImgP;
-    if (m_pnSmallBImg != NULL)
-        delete[] m_pnSmallBImg;
-    if (m_pnSmallBImgP != NULL)
-        delete[] m_pnSmallBImgP;
-
-    if (m_pfSmallInteg != NULL)
-        delete[] m_pfSmallInteg;
-    if (m_pfSmallDenom != NULL)
-        delete[] m_pfSmallDenom;
-    if (m_pfSmallNormPk != NULL)
-        delete[] m_pfSmallNormPk;
-    if (m_pfSmallPk_p != NULL)
-        delete[] m_pfSmallPk_p;
-
-    if (m_pnYImg != NULL)
-        delete[] m_pnYImg;
-    if (m_pnYImgP != NULL)
-        delete[] m_pnYImgP;
     if (m_pnRImg != NULL)
         delete[] m_pnRImg;
     if (m_pnGImg != NULL)
         delete[] m_pnGImg;
     if (m_pnBImg != NULL)
         delete[] m_pnBImg;
-    if (m_pnRImgP != NULL)
-        delete[] m_pnRImgP;
-    if (m_pnGImgP != NULL)
-        delete[] m_pnGImgP;
-    if (m_pnBImgP != NULL)
-        delete[] m_pnBImgP;
 
-    if (m_pfTransmission != NULL)
-        delete[] m_pfTransmission;
-    if (m_pfTransmissionR != NULL)
-        delete[] m_pfTransmissionR;
-    if (m_pfTransmissionP != NULL)
-        delete[] m_pfTransmissionP;
-
-    if (m_pfInteg != NULL)
-        delete[] m_pfInteg;
-    if (m_pfDenom != NULL)
-        delete[] m_pfDenom;
-    if (m_pfY != NULL)
-        delete[] m_pfY;
-    if (m_pfPk_p != NULL)
-        delete[] m_pfPk_p;
-    if (m_pfNormPk != NULL)
-        delete[] m_pfNormPk;
     if (m_pfGuidedLUT != NULL)
         delete[] m_pfGuidedLUT;
 
-    m_pfSmallTransP = NULL;
-    m_pfSmallTrans = NULL;
-    m_pfSmallTransR = NULL;
-    m_pnSmallYImg = NULL;
-    m_pnSmallYImgP = NULL;
-
-    m_pnSmallRImg = NULL;
-    m_pnSmallRImgP = NULL;
-    m_pnSmallGImg = NULL;
-    m_pnSmallGImgP = NULL;
-    m_pnSmallBImg = NULL;
-    m_pnSmallBImgP = NULL;
-
-    m_pfSmallInteg = NULL;
-    m_pfSmallDenom = NULL;
-    m_pfSmallY = NULL;
-
     m_pfTransmission = NULL;
     m_pfTransmissionR = NULL;
-    m_pfTransmissionP = NULL;
-    m_pnYImg = NULL;
-    m_pnYImgP = NULL;
 
     m_pnRImg = NULL;
     m_pnGImg = NULL;
     m_pnBImg = NULL;
 
-    m_pnRImgP = NULL;
-    m_pnGImgP = NULL;
-    m_pnBImgP = NULL;
-
-    m_pfInteg = NULL;
-    m_pfDenom = NULL;
-    m_pfY = NULL;
-
-    m_pfSmallPk_p = NULL;
-    m_pfSmallNormPk = NULL;
-    m_pfPk_p = NULL;
-    m_pfNormPk = NULL;
     m_pfGuidedLUT = NULL;
 }
 
@@ -427,7 +302,7 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
                  the pure white.
                  IT IS A RECURSIVE FUNCTION.
     Parameter:
-        imInput - input image (cv iplimage)
+        imInput - input image
     Return:
         m_anAirlight: estimated atmospheric light value
  */
