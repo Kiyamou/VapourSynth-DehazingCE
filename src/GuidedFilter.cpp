@@ -230,7 +230,7 @@ void dehazing::BoxFilter(float* pfInArray1, float* pfInArray2, float* pfInArray3
 		m_pfTransmission - initial transmission (block_based)
 		m_pnYImg - guidance image (Y image)
 	Return:
-		m_pfTransmissionR - filtered transmission 为计算m_pfTransmissionR，话说这个R是什么意思
+		m_pfTransmissionR - filtered transmission
  */
 void dehazing::GuidedFilter(int width, int height, float fEps)
 {

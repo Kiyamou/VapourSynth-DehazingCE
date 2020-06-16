@@ -218,7 +218,6 @@ void dehazing::TransmissionEstimationColor(const uint8_t* pnImageR, const uint8_
 float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnImageG, const uint8_t* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height)
 {
     int nOutR, nOutG, nOutB;
-    int nSquaredOut;
     float fOptTrs;
     float fCost, fMinCost, fMean;
 
