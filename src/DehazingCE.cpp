@@ -3,10 +3,13 @@
 #include "DehazingCE.h"
 #include "Helper.hpp"
 
-dehazing::dehazing(int nW, int nH, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+constexpr float SQRT_3 = 1.733f;
+
+dehazing::dehazing(int nW, int nH, int nPeak, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
+    peak = nPeak;
 
     // Flags for temporal coherence & post processing
     m_PreviousFlag = bPrevFlag;
@@ -69,7 +72,8 @@ dehazing::~dehazing()
 }
 
 
-void dehazing::RemoveHaze(const uint8_t* src, const uint8_t* refpB, const uint8_t* refpG, const uint8_t* refpR, uint8_t* dst, int stride, int ref_width, int ref_height)
+template <typename T>
+void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height)
 {
     float fEps = 0.001f;
 
@@ -87,8 +91,8 @@ void dehazing::RemoveHaze(const uint8_t* src, const uint8_t* refpB, const uint8_
     Return:
         imOutput - Dehazed image.
  */
-//template <typename T>
-void dehazing::RestoreImage(const uint8_t* src, uint8_t* dst, int width, int height, int stride)
+template <typename T>
+void dehazing::RestoreImage(const T* src, T* dst, int width, int height, int stride)
 {
     float fA_B = (float)m_anAirlight[0];
     float fA_G = (float)m_anAirlight[1];
@@ -111,9 +115,9 @@ void dehazing::RestoreImage(const uint8_t* src, uint8_t* dst, int width, int hei
                 const auto pos = (j * width + i) * 3;
                 const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
 
-                dst[pos]     = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, 255)];
-                dst[pos + 1] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, 255)];
-                dst[pos + 2] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, 255)];
+                dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, peak)];
+                dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, peak)];
+                dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, peak)];
             }
         }
     }
@@ -127,8 +131,8 @@ void dehazing::RestoreImage(const uint8_t* src, uint8_t* dst, int width, int hei
     Return:
         imOutput - Dehazed frame.
  */
-//template <typename T>
-void dehazing::PostProcessing(const uint8_t* src, uint8_t* dst, int width, int height, int stride)
+template <typename T>
+void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int stride)
 {
     const int nNumStep = 10;
     const int nDisPos = 20;
@@ -146,9 +150,9 @@ void dehazing::PostProcessing(const uint8_t* src, uint8_t* dst, int width, int h
             const auto pos = (j * width + i) * 3;
             const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f);
 
-            dst[pos]     = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, 255)];
-            dst[pos + 1] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, 255)];
-            dst[pos + 2] = (uint8_t)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, 255)];
+            dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, peak)];
+            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, peak)];
+            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, peak)];
 
             // If transmission is less than 0.4, apply post processing because more dehazed block yields more artifacts
             if (i > nDisPos + nNumStep && m_pfTransmissionR[j * width + i - nDisPos] < 0.4)
@@ -170,9 +174,9 @@ void dehazing::PostProcessing(const uint8_t* src, uint8_t* dst, int width, int h
                 {
                     for (auto nS = 1; nS < nNumStep + 1; nS++)
                     {
-                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     = (uint8_t)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     + (float)nS * nAD0 / (float)nNumStep, 0.f, 255.f);
-                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] = (uint8_t)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] + (float)nS * nAD1 / (float)nNumStep, 0.f, 255.f);
-                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] = (uint8_t)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] + (float)nS * nAD2 / (float)nNumStep, 0.f, 255.f);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     + (float)nS * nAD0 / (float)nNumStep, 0.f, (float)peak);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] + (float)nS * nAD1 / (float)nNumStep, 0.f, (float)peak);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] + (float)nS * nAD2 / (float)nNumStep, 0.f, (float)peak);
                     }
                 }
             }
@@ -180,7 +184,8 @@ void dehazing::PostProcessing(const uint8_t* src, uint8_t* dst, int width, int h
     }
 }
 
-void dehazing::TransmissionEstimationColor(const uint8_t* pnImageR, const uint8_t* pnImageG, const uint8_t* pnImageB, int ref_width, int ref_height)
+template <typename T>
+void dehazing::TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int ref_width, int ref_height)
 {
     for (auto y = 0; y < ref_height; y += TBlockSize)
     {
@@ -192,7 +197,7 @@ void dehazing::TransmissionEstimationColor(const uint8_t* pnImageR, const uint8_
                 for (auto xStep = x; xStep < x + TBlockSize; xStep++)
                 {
                     int ly = std::min(yStep, ref_height - 1);
-					int lx = std::min(xStep, ref_width - 1);
+                    int lx = std::min(xStep, ref_width - 1);
                     m_pfTransmission[ly * ref_width + lx] = fTrans;
                 }
             }
@@ -215,7 +220,8 @@ void dehazing::TransmissionEstimationColor(const uint8_t* pnImageR, const uint8_
     Return:
         fOptTrs
  */
-float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnImageG, const uint8_t* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height)
+template <typename T>
+float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height)
 {
     int nOutR, nOutG, nOutB;
     float fOptTrs;
@@ -227,7 +233,7 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
     int nNumberofPixels = (nEndY - nStartY) * (nEndX - nStartX) * 3;
 
     float fTrans = TransInit;
-    int nTrans = (int)(128.f / TransInit);
+    int nTrans = (int)(((peak + 1) >> 1) / TransInit);
 
     for (auto nCounter = 0; nCounter < 7; nCounter++)
     {
@@ -240,14 +246,14 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
         {
             for (auto x = nStartX; x < nEndX; x++)
             {
-                // (I-A)/t + A --> ((I-A)*k*128 + A*128)/128
-                nOutB = (((int)pnImageB[y * ref_width + x] - m_anAirlight[0]) * nTrans + 128 * m_anAirlight[0]) >> 7;
-                nOutG = (((int)pnImageG[y * ref_width + x] - m_anAirlight[1]) * nTrans + 128 * m_anAirlight[1]) >> 7;
-                nOutR = (((int)pnImageR[y * ref_width + x] - m_anAirlight[2]) * nTrans + 128 * m_anAirlight[2]) >> 7;
+                // (I-A)/t + A --> ((I-A) * k * ((peak + 1)/2) + A * ((peak+1)/2)) / ((peak+1)/2)
+                nOutB = (((int)pnImageB[y * ref_width + x] - m_anAirlight[0]) * nTrans + ((peak + 1) >> 1) * m_anAirlight[0]) >> 7;
+                nOutG = (((int)pnImageG[y * ref_width + x] - m_anAirlight[1]) * nTrans + ((peak + 1) >> 1) * m_anAirlight[1]) >> 7;
+                nOutR = (((int)pnImageR[y * ref_width + x] - m_anAirlight[2]) * nTrans + ((peak + 1) >> 1) * m_anAirlight[2]) >> 7;
 
-                if (nOutR > 255)
+                if (nOutR > peak)
                 {
-                    nSumofSLoss += (nOutR - 255) * (nOutR - 255);
+                    nSumofSLoss += (nOutR - peak) * (nOutR - peak);
                     nLossCount++;
                 }
                 else if (nOutR < 0)
@@ -255,9 +261,9 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
                     nSumofSLoss += nOutR * nOutR;
                     nLossCount++;
                 }
-                if (nOutG > 255)
+                if (nOutG > peak)
                 {
-                    nSumofSLoss += (nOutG - 255) * (nOutG - 255);
+                    nSumofSLoss += (nOutG - peak) * (nOutG - peak);
                     nLossCount++;
                 }
                 else if (nOutG < 0)
@@ -265,9 +271,9 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
                     nSumofSLoss += nOutG * nOutG;
                     nLossCount++;
                 }
-                if (nOutB > 255)
+                if (nOutB > peak)
                 {
-                    nSumofSLoss += (nOutB - 255) * (nOutB - 255);
+                    nSumofSLoss += (nOutB - peak) * (nOutB - peak);
                     nLossCount++;
                 }
                 else if (nOutB < 0)
@@ -291,7 +297,7 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
         }
 
         fTrans += 0.1f;
-        nTrans = (int)(1.f / fTrans * 128.f);
+        nTrans = (int)(1.f / fTrans * ((peak + 1) >> 1));
     }
     return fOptTrs;
 }
@@ -311,10 +317,10 @@ float dehazing::NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnI
     Return:
         m_anAirlight: estimated atmospheric light value
  */
-//template <typename T>
-void dehazing::AirlightEstimation(const uint8_t* src, int width, int height, int stride)
+template <typename T>
+void dehazing::AirlightEstimation(const T* src, int width, int height, int stride)
 {
-    int nMinDistance = 65536;
+    int nMinDistance = (int)(peak * SQRT_3);
 
     int nMaxIndex;
     double dpScore[3];
@@ -330,22 +336,22 @@ void dehazing::AirlightEstimation(const uint8_t* src, int width, int height, int
     int half_w = width / 2;
     int half_h = height / 2;
 
-    uint8_t* iplUpperLeft  = new uint8_t[half_w * half_h * 3];
-    uint8_t* iplUpperRight = new uint8_t[half_w * half_h * 3];
-    uint8_t* iplLowerLeft  = new uint8_t[half_w * half_h * 3];
-    uint8_t* iplLowerRight = new uint8_t[half_w * half_h * 3];
+    T* iplUpperLeft  = new T[half_w * half_h * 3];
+    T* iplUpperRight = new T[half_w * half_h * 3];
+    T* iplLowerLeft  = new T[half_w * half_h * 3];
+    T* iplLowerRight = new T[half_w * half_h * 3];
 
-    memcpy(iplUpperLeft,  src, half_w * half_h * 3 * sizeof(uint8_t));
-    memcpy(iplUpperRight, src + half_w * half_h * 3, half_w * half_h * 3 * sizeof(uint8_t));
-    memcpy(iplLowerLeft,  src + half_w * half_h * 6, half_w * half_h * 3 * sizeof(uint8_t));
-    memcpy(iplLowerRight, src + half_w * half_h * 9, half_w * half_h * 3 * sizeof(uint8_t));
+    memcpy(iplUpperLeft,  src, half_w * half_h * 3 * sizeof(T));
+    memcpy(iplUpperRight, src + half_w * half_h * 3, half_w * half_h * 3 * sizeof(T));
+    memcpy(iplLowerLeft,  src + half_w * half_h * 6, half_w * half_h * 3 * sizeof(T));
+    memcpy(iplLowerRight, src + half_w * half_h * 9, half_w * half_h * 3 * sizeof(T));
 
     if (height * width > 200)
     {
         // compute the mean and std-dev in the sub-block
-        uint8_t* iplR = new uint8_t[half_h * half_w];
-        uint8_t* iplG = new uint8_t[half_h * half_w];
-        uint8_t* iplB = new uint8_t[half_h * half_w];
+        T* iplR = new T[half_h * half_w];
+        T* iplG = new T[half_h * half_w];
+        T* iplB = new T[half_h * half_w];
 
         //////////////////////////////////
         // upper left sub-block
@@ -485,9 +491,9 @@ void dehazing::AirlightEstimation(const uint8_t* src, int width, int height, int
             for (auto i = 0; i < width; i++)
             {
                 const auto pos = (j * width + i) * 3;
-                // 255-r, 255-g, 255-b
-                int nDistance = int(sqrt((255 - src[pos]) * (255 - src[pos]) + (255 - src[pos + 1]) * (255 - src[pos + 1])
-                                         + (255 - src[pos + 2]) * (255 - src[pos + 2])));
+                // peak-r, peak-g, peak-b
+                int nDistance = int(sqrt((peak - src[pos]) * (peak - src[pos]) + (peak - src[pos + 1]) * (peak - src[pos + 1])
+                                         + (peak - src[pos + 2]) * (peak - src[pos + 2])));
                 if (nMinDistance > nDistance)
                 {
                     // atmospheric light value

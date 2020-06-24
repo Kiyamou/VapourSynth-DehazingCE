@@ -10,18 +10,27 @@
 class dehazing
 {
 public:
-    dehazing(int nW, int nH, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
-    ~dehazing();
+    dehazing(int nW, int nH, int nPeak, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
+    
+     ~dehazing();
 
-    void RemoveHaze(const uint8_t* src, const uint8_t* refpB, const uint8_t* refpG, const uint8_t* refpR, uint8_t* dst, int stride, int ref_width, int ref_height);
+    template <typename T>
+    void RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height);
 
-    void AirlightEstimation(const uint8_t* src, int width, int height, int stride);
+    template <typename T>
+    void AirlightEstimation(const T* src, int width, int height, int stride);
 
-	float NFTrsEstimationColor(const uint8_t* pnImageR, const uint8_t* pnImageG, const uint8_t* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height);
-    void TransmissionEstimationColor(const uint8_t* pnImageR, const uint8_t* pnImageG, const uint8_t* pnImageB, int ref_width, int ref_height);
+    template <typename T>
+    float NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height);
 
-    void PostProcessing(const uint8_t* src, uint8_t* dst, int width, int height, int stride);  // Called by RestoreImage();
-    void RestoreImage(const uint8_t* src, uint8_t* dst, int height, int width, int stride);
+    template <typename T>
+    void TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int ref_width, int ref_height);
+
+    template <typename T>
+    void PostProcessing(const T* src, T* dst, int width, int height, int stride);  // Called by RestoreImage();
+
+    template <typename T>
+    void RestoreImage(const T* src, T* dst, int height, int width, int stride);
 
     void CalcAcoeff(float* pfSigma, float* pfCov, float* pfA1, float* pfA2, float* pfA3, int nIdx);
     void BoxFilter(float* pfInArray, int nR, int nWid, int nHei, float*& fOutArray);
@@ -35,6 +44,7 @@ public:
 private:
     int width;
     int height;
+    int peak;
 
     int TBlockSize;
     float TransInit;

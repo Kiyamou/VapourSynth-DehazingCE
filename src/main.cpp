@@ -59,7 +59,7 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
         srcpR += stride;
     }
 
-    d->dehazing_clip->RemoveHaze((const uint8_t*)srcInterleaved, (const uint8_t*)refpB, (const uint8_t*)refpG, (const uint8_t*)refpR, (uint8_t*)dstInterleaved, stride, ref_width, ref_height);
+    d->dehazing_clip->RemoveHaze((const T*)srcInterleaved, (const T*)refpB, (const T*)refpG, (const T*)refpR, (T*)dstInterleaved, stride, ref_width, ref_height);
 
     //// change back from Interleaved
     T* VS_RESTRICT dstpR = reinterpret_cast<T*>(vsapi->getWritePtr(dst, 0));
@@ -137,13 +137,13 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
 
     int width = d->vi->width;
     int height = d->vi->height;
+    int peak = (1 << d->vi->format->bitsPerSample) - 1;
 
     try
     {
         if (!isConstantFormat(d->vi) ||
-            (d->vi->format->sampleType == stInteger && d->vi->format->bitsPerSample >  16) ||
-            (d->vi->format->sampleType == stFloat   && d->vi->format->bitsPerSample != 32))
-            throw std::string{ "only constant format 8-16 bit integer and 32 bits float input supported" };
+            (d->vi->format->sampleType == stInteger && d->vi->format->bitsPerSample > 16))
+            throw std::string{ "only constant format 8-16 bit integer input supported" };
 
         // donwscale clip for Trans Estimation
         d->rnode = vsapi->propGetNode(in, "ref", 0, &err);
@@ -188,7 +188,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             PostFlag = false;
 
-        d->dehazing_clip = new dehazing(width, height, TBlockSize, TransInit, false, PostFlag, 5.f, 1.f, GBlockSize);
+        d->dehazing_clip = new dehazing(width, height, peak, TBlockSize, TransInit, false, PostFlag, 5.f, 1.f, GBlockSize);
 
         //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
         //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()

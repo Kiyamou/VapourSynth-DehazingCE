@@ -1,4 +1,7 @@
 # VapourSynth-DehazingCE
+
+[![Build Status](https://api.travis-ci.org/Kiyamou/VapourSynth-DehazingCE.svg?branch=master)](https://api.travis-ci.org/Kiyamou/VapourSynth-DehazingCE.svg?branch=master)
+
 DehazingCE is a dehazing plugin for VapourSynth, based on contrast enhancement.
 
 Original paper: [Optimized contrast enhancement for real-time image and video dehazing](http://mcl.korea.ac.kr/projects/dehazing/#userconsent#)
