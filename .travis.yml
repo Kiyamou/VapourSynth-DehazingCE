@@ -1,0 +1,23 @@
+sudo: required
+
+language: cpp
+complier:
+  - gcc
+
+branches:
+  only:
+    - master
+
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install build-essential wget
+
+script:
+  - wget https://github.com/vapoursynth/vapoursynth/archive/R50.tar.gz
+  - tar -xzvf R50.tar.gz vapoursynth-R50/include
+  - mkdir src/vapoursynth
+  - mv vapoursynth-R50/include/VapourSynth.h include/vapoursynth/VapourSynth.h
+  - mv vapoursynth-R50/include/VSHelper.h include/vapoursynth/VSHelper.h
+  - mkdir build && cd build
+  - cmake ..
+  - cmake --build .
