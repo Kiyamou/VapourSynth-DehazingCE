@@ -19,5 +19,5 @@ script:
   - mv vapoursynth-R50/include/VapourSynth.h include/vapoursynth/VapourSynth.h
   - mv vapoursynth-R50/include/VSHelper.h include/vapoursynth/VSHelper.h
   - mkdir build && cd build
-  - cmake .. -DVAPOURSYNTH_INCLUDE_DIR src/include
+  - cmake -DVAPOURSYNTH_INCLUDE_DIR src/include ..
   - cmake --build .
