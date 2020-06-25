@@ -242,14 +242,15 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
         int nSumofSquaredOuts = 0;
         int nSumofOuts = 0;
 
+        int half_peak = ((peak + 1) >> 1);
         for (auto y = nStartY; y < nEndY; y++)
         {
             for (auto x = nStartX; x < nEndX; x++)
             {
                 // (I-A)/t + A --> ((I-A) * k * ((peak + 1)/2) + A * ((peak+1)/2)) / ((peak+1)/2)
-                nOutB = (((int)pnImageB[y * ref_width + x] - m_anAirlight[0]) * nTrans + ((peak + 1) >> 1) * m_anAirlight[0]) >> 7;
-                nOutG = (((int)pnImageG[y * ref_width + x] - m_anAirlight[1]) * nTrans + ((peak + 1) >> 1) * m_anAirlight[1]) >> 7;
-                nOutR = (((int)pnImageR[y * ref_width + x] - m_anAirlight[2]) * nTrans + ((peak + 1) >> 1) * m_anAirlight[2]) >> 7;
+                nOutB = (((int)pnImageB[y * ref_width + x] - m_anAirlight[0]) * nTrans + half_peak * m_anAirlight[0]) / half_peak;
+                nOutG = (((int)pnImageG[y * ref_width + x] - m_anAirlight[1]) * nTrans + half_peak * m_anAirlight[1]) / half_peak;
+                nOutR = (((int)pnImageR[y * ref_width + x] - m_anAirlight[2]) * nTrans + half_peak * m_anAirlight[2]) / half_peak;
 
                 if (nOutR > peak)
                 {
