@@ -6,7 +6,7 @@ DehazingCE is a dehazing plugin for VapourSynth, based on contrast enhancement.
 
 Original paper: [Optimized contrast enhancement for real-time image and video dehazing](http://mcl.korea.ac.kr/projects/dehazing/#userconsent#)
 
-Still in development, only support 8bit RGB now.
+Still in development, support 8-16 bit RGB.
 
 ## Usage
 
@@ -17,7 +17,7 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int trans_size, int guide_s
 * ***src***
     * Required parameter.
     * Clip to process.
-    * Only support 8bit RGB now.
+    * Support 8-16 bit RGB.
 * ***ref***
     * Optional parameter. *Default: src*.
 * ***trans***
