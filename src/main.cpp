@@ -142,9 +142,9 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
 
     try
     {
-        if (!isConstantFormat(d->vi) ||
+        if (!isConstantFormat(d->vi) || d->vi->format->colorFamily != cmRGB ||
             (d->vi->format->sampleType == stInteger && d->vi->format->bitsPerSample > 16))
-            throw std::string{ "only constant format 8-16 bit integer input supported" };
+            throw std::string{ "only constant format RGB 8-16 bit integer input supported" };
 
         // donwscale clip for Trans Estimation
         d->rnode = vsapi->propGetNode(in, "ref", 0, &err);

@@ -81,8 +81,8 @@ private:
     float* m_pfTransmission;   // preliminary transmission
     float* m_pfTransmissionR;  // refined transmission
 
-    float ExpLUT[256];
-    float m_pucGammaLUT[256];
+    float ExpLUT[65536];
+    float m_pucGammaLUT[65536];
     float* m_pfGuidedLUT;
 };
 
