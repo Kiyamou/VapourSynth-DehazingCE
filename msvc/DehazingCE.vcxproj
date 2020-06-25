@@ -151,7 +151,6 @@
     <ClInclude Include="..\src\Helper.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\DehazingCE.cpp" />
     <ClCompile Include="..\src\GuidedFilter.cpp" />
     <ClCompile Include="..\src\Lut.cpp" />
     <ClCompile Include="..\src\main.cpp" />

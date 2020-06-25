@@ -23,9 +23,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\DehazingCE.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\GuidedFilter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

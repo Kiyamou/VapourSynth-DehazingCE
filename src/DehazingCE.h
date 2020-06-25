@@ -11,8 +11,8 @@ class dehazing
 {
 public:
     dehazing(int nW, int nH, int nPeak, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
-    
-     ~dehazing();
+
+    ~dehazing();
 
     template <typename T>
     void RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height);

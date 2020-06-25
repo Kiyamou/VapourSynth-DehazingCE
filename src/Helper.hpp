@@ -15,7 +15,7 @@ inline T clamp(T input, T range_min, T range_max)
 
 
 // Modified from https://blog.csdn.net/fengbingchun/article/details/73323475
-template<typename T>
+template <typename T>
 void meanStdDev(T* mat, double mean, double variance, double stddev, int w, int h)
 {
     double sum{ 0.0 }, sqsum{ 0.0 };

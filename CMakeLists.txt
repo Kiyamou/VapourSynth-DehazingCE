@@ -17,5 +17,5 @@ elseif (WIN32)
 endif()
 
 add_definitions(-std=c++14)
-add_library(DehazingCE SHARED src/main.cpp src/DehazingCE.cpp src/GuidedFilter.cpp src/Lut.cpp)
+add_library(DehazingCE SHARED src/main.cpp src/GuidedFilter.cpp src/Lut.cpp)
 target_include_directories(DehazingCE PRIVATE ${DVAPOURSYNTH_INCLUDE_DIR})

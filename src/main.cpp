@@ -4,6 +4,7 @@
 #include <string>
 
 #include "DehazingCE.h"
+#include "DehazingCE.cpp"
 
 struct FilterData
 {
@@ -59,7 +60,7 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
         srcpR += stride;
     }
 
-    d->dehazing_clip->RemoveHaze((const T*)srcInterleaved, (const T*)refpB, (const T*)refpG, (const T*)refpR, (T*)dstInterleaved, stride, ref_width, ref_height);
+    d->dehazing_clip->RemoveHaze((const T*)srcInterleaved, refpB, refpG, refpR, dstInterleaved, stride, ref_width, ref_height);
 
     //// change back from Interleaved
     T* VS_RESTRICT dstpR = reinterpret_cast<T*>(vsapi->getWritePtr(dst, 0));
@@ -76,8 +77,8 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
             dstpR[x] = dstInterleaved[pos + 2];
         }
         dstpB += stride;
-        dstpR += stride;
         dstpG += stride;
+        dstpR += stride;
     }
 
     delete[] srcInterleaved;
