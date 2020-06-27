@@ -10,7 +10,7 @@
 class dehazing
 {
 public:
-    dehazing(int nW, int nH, int nPeak, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
+    dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
 
     ~dehazing();
 
@@ -45,6 +45,7 @@ private:
     int width;
     int height;
     int peak;
+    int bits;
 
     int TBlockSize;
     float TransInit;

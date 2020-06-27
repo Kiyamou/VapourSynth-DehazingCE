@@ -138,7 +138,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
 
     int width = d->vi->width;
     int height = d->vi->height;
-    int peak = (1 << d->vi->format->bitsPerSample) - 1;
+    int bits = d->vi->format->bitsPerSample;
 
     try
     {
@@ -189,7 +189,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             PostFlag = false;
 
-        d->dehazing_clip = new dehazing(width, height, peak, TBlockSize, TransInit, false, PostFlag, 5.f, 1.f, GBlockSize);
+        d->dehazing_clip = new dehazing(width, height, bits, TBlockSize, TransInit, false, PostFlag, 5.f, 1.f, GBlockSize);
 
         //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
         //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()

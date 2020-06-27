@@ -5,11 +5,12 @@
 
 constexpr float SQRT_3 = 1.733f;
 
-dehazing::dehazing(int nW, int nH, int nPeak, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
-    peak = nPeak;
+    peak = (1 << nBits) - 1;
+    bits = nBits;
 
     // Flags for temporal coherence & post processing
     m_PreviousFlag = bPrevFlag;
@@ -235,7 +236,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
     float fTrans = TransInit;
     int nTrans = (int)(((peak + 1) >> 1) / TransInit);
 
-    for (auto nCounter = 0; nCounter < 7; nCounter++)
+    for (auto nCounter = 0; nCounter < bits - 1; nCounter++)
     {
         int nSumofSLoss = 0;
         int nLossCount = 0;
