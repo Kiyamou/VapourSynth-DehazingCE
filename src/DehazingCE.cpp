@@ -3,8 +3,6 @@
 #include "DehazingCE.h"
 #include "Helper.hpp"
 
-constexpr float SQRT_3 = 1.733f;
-
 dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
@@ -142,9 +140,9 @@ void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int s
             const auto pos = (j * width + i) * 3;
             const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f);
 
-            dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
-            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
-            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
+            dst[pos]     = (T)m_pucGammaLUT[clamp((int)((src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
+            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)((src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
+            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)((src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
 
             // If transmission is less than 0.4, apply post processing because more dehazed block yields more artifacts
             if (i > nDisPos + nNumStep && m_pfTransmissionR[j * width + i - nDisPos] < 0.4)
@@ -313,7 +311,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
 template <typename T>
 void dehazing::AirlightEstimation(const T* src, int width, int height, int stride)
 {
-    int nMinDistance = (int)(peak * SQRT_3);
+    int nMinDistance = peak * peak * 3;
 
     int nMaxIndex;
     double dpScore[3];
@@ -485,8 +483,8 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
             {
                 const auto pos = (j * width + i) * 3;
                 // peak-r, peak-g, peak-b
-                int nDistance = int(sqrt((peak - src[pos]) * (peak - src[pos]) + (peak - src[pos + 1]) * (peak - src[pos + 1])
-                                         + (peak - src[pos + 2]) * (peak - src[pos + 2])));
+                int nDistance = (peak - src[pos]) * (peak - src[pos]) + (peak - src[pos + 1]) * (peak - src[pos + 1]) +
+                                (peak - src[pos + 2]) * (peak - src[pos + 2]);
                 if (nMinDistance > nDistance)
                 {
                     // atmospheric light value
