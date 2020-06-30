@@ -169,6 +169,10 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
                 throw std::string("input clip and clip \"ref\" must have the same number of frames");
         }
 
+        int ABlockSize = int64ToIntS(vsapi->propGetInt(in, "air_size", 0, &err));
+        if (err)
+            ABlockSize = 200;
+
         int GBlockSize = int64ToIntS(vsapi->propGetInt(in, "guide_size", 0, &err));
         if (err)
             GBlockSize = 40;
@@ -193,7 +197,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             PostFlag = false;
 
-        d->dehazing_clip = new dehazing(width, height, bits, TBlockSize, TransInit, false, PostFlag, lamdaA, 1.f, GBlockSize);
+        d->dehazing_clip = new dehazing(width, height, bits, ABlockSize, TBlockSize, TransInit, false, PostFlag, lamdaA, 1.f, GBlockSize);
 
         //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
         //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()
@@ -217,6 +221,7 @@ VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegiste
         "src:clip;"
         "ref:clip:opt;"
         "trans:float:opt;"
+        "air_size:int:opt;"
         "guide_size:int:opt;"
         "trans_size:int:opt;"
         "lamda:float:opt;"

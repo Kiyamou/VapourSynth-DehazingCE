@@ -10,7 +10,7 @@
 class dehazing
 {
 public:
-    dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
+    dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
 
     ~dehazing();
 
@@ -55,6 +55,7 @@ private:
     int StepSize;
     float GSigma;
 
+    int ABlockSize;
     int m_anAirlight[3];
     int m_nAirlight;
 

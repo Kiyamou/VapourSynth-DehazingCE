@@ -3,7 +3,7 @@
 #include "DehazingCE.h"
 #include "Helper.hpp"
 
-dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
@@ -14,11 +14,11 @@ dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit,
     m_PreviousFlag = bPrevFlag;
     m_PostFlag = bPosFlag;
 
-    // parameters for each cost (loss cost, temporal coherence cost)
+    // Parameters for each cost (loss cost, temporal coherence cost)
     Lambda1 = fL1;
     Lambda2 = fL2;  // only used in previous mode
 
-    // block size for transmission estimation
+    // Block size for transmission estimation
     TBlockSize = nTBlockSize;
     TransInit = fTransInit;
 
@@ -26,6 +26,9 @@ dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit,
     GBlockSize = nGBlockSize;
     StepSize = 2;
     GSigma = 10.f;
+
+    // Block size for air estimation
+    ABlockSize = nABlockSize;
 
     // Specify the region of atmospheric light estimation
     TopLeftX = 0;
