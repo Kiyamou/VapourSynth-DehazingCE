@@ -56,7 +56,7 @@ private:
     float GSigma;
 
     int ABlockSize;
-    int m_anAirlight[3];
+    int m_anAirlight[3] = { 0 };
     int m_nAirlight;
 
     // Airlight search range
