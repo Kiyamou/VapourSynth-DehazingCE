@@ -340,7 +340,7 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
     memcpy(iplLowerLeft,  src + half_w * half_h * 6, half_w * half_h * 3 * sizeof(T));
     memcpy(iplLowerRight, src + half_w * half_h * 9, half_w * half_h * 3 * sizeof(T));
 
-    if (height * width > 200)
+    if (height * width > ABlockSize)
     {
         // compute the mean and std-dev in the sub-block
         T* iplR = new T[half_h * half_w];
