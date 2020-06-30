@@ -47,29 +47,29 @@ dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit,
 
 dehazing::~dehazing()
 {
-    if (m_pfTransmission != NULL)
+    if (m_pfTransmission != nullptr)
         delete[] m_pfTransmission;
-    if (m_pfTransmissionR != NULL)
+    if (m_pfTransmissionR != nullptr)
         delete[] m_pfTransmissionR;
 
-    if (m_pnRImg != NULL)
+    if (m_pnRImg != nullptr)
         delete[] m_pnRImg;
-    if (m_pnGImg != NULL)
+    if (m_pnGImg != nullptr)
         delete[] m_pnGImg;
-    if (m_pnBImg != NULL)
+    if (m_pnBImg != nullptr)
         delete[] m_pnBImg;
 
-    if (m_pfGuidedLUT != NULL)
+    if (m_pfGuidedLUT != nullptr)
         delete[] m_pfGuidedLUT;
 
-    m_pfTransmission = NULL;
-    m_pfTransmissionR = NULL;
+    m_pfTransmission = nullptr;
+    m_pfTransmissionR = nullptr;
 
-    m_pnRImg = NULL;
-    m_pnGImg = NULL;
-    m_pnBImg = NULL;
+    m_pnRImg = nullptr;
+    m_pnGImg = nullptr;
+    m_pnBImg = nullptr;
 
-    m_pfGuidedLUT = NULL;
+    m_pfGuidedLUT = nullptr;
 }
 
 
@@ -95,10 +95,6 @@ void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T*
 template <typename T>
 void dehazing::RestoreImage(const T* src, T* dst, int width, int height, int stride)
 {
-    float fA_B = (float)m_anAirlight[0];
-    float fA_G = (float)m_anAirlight[1];
-    float fA_R = (float)m_anAirlight[2];
-
     // post processing flag
     if (m_PostFlag == true)
     {
@@ -107,18 +103,17 @@ void dehazing::RestoreImage(const T* src, T* dst, int width, int height, int str
     else
     {
         //#pragma omp parallel for
-        // 2. I' = (I - Airlight) / Transmission + Airlight
         for (auto j = 0; j < height; j++)
         {
             for (auto i = 0; i < width; i++)
             {
-                // 3. Gamma correction using Lut
+                // I' = (I - Airlight) / Transmission + Airlight and Gamma correction using Lut
                 const auto pos = (j * width + i) * 3;
                 const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
 
-                dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, peak)];
-                dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, peak)];
-                dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, peak)];
+                dst[pos]     = (T)m_pucGammaLUT[clamp((int)((src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
+                dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)((src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
+                dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)((src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
             }
         }
     }
@@ -138,22 +133,18 @@ void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int s
     const int nNumStep = 10;
     const int nDisPos = 20;
 
-    float fA_B = (float)m_anAirlight[0];
-    float fA_G = (float)m_anAirlight[1];
-    float fA_R = (float)m_anAirlight[2];
-
 #pragma omp parallel for private(nAD0, nAD1, nAD1, nS)
     for (auto j = 0; j < height; j++)
     {
         for (auto i = 0; i < width; i++)
         {
-            // 1. I' = (I - Airlight) / Transmission + Airlight
+            // I' = (I - Airlight) / Transmission + Airlight and Gamma correction using Lut
             const auto pos = (j * width + i) * 3;
             const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f);
 
-            dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - fA_B) / transmission + fA_B), 0, peak)];
-            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - fA_G) / transmission + fA_G), 0, peak)];
-            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - fA_R) / transmission + fA_R), 0, peak)];
+            dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
+            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
+            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
 
             // If transmission is less than 0.4, apply post processing because more dehazed block yields more artifacts
             if (i > nDisPos + nNumStep && m_pfTransmissionR[j * width + i - nDisPos] < 0.4)
