@@ -5,7 +5,7 @@
 
 constexpr float SQRT_3 = 1.733f;
 
-dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
