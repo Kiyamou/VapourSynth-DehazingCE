@@ -10,7 +10,7 @@
 class dehazing
 {
 public:
-    dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize);
+    dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize);
 
     ~dehazing();
 
@@ -68,7 +68,7 @@ private:
     bool m_PreviousFlag;
     bool m_PostFlag;  // Flag for post processing(deblocking)
 
-    float Lambda1;
+    double Lambda1;
     float Lambda2;
 
     int TopLeftX;

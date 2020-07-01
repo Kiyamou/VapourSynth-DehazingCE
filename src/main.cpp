@@ -185,9 +185,9 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             TransInit = 0.3f;
 
-        float lamdaA = (float)(vsapi->propGetFloat(in, "lamda", 0, &err));
+        double lamdaA = vsapi->propGetFloat(in, "lamda", 0, &err);
         if (err)
-            lamdaA = 5.f;
+            lamdaA = 5.0;
 
 		float gamma = (float)(vsapi->propGetFloat(in, "gamma", 0, &err));
         if (err)

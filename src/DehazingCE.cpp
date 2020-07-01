@@ -17,7 +17,7 @@ dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, 
     m_PostFlag = bPosFlag;
 
     // Parameters for each cost (loss cost, temporal coherence cost)
-    Lambda1 = fL1;
+    Lambda1 = dL1;
     Lambda2 = fL2;  // only used in previous mode
 
     // Block size for transmission estimation
