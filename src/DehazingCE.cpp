@@ -282,8 +282,8 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
             }
         }
 
-		dMean = (double)nSumofOuts / nNumberofPixels;
-		dCost = Lambda1 * (double)nSumofSLoss / nNumberofPixels
+        dMean = (double)nSumofOuts / nNumberofPixels;
+        dCost = Lambda1 * (double)nSumofSLoss / nNumberofPixels
                 -((double)nSumofSquaredOuts / nNumberofPixels - dMean * dMean);
 
         if (nCounter == 0 || dMinCost > dCost)
