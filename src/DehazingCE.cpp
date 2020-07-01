@@ -230,7 +230,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
     float fTrans = TransInit;
     int nTrans = (int)(((peak + 1) >> 1) / TransInit);
 
-    for (auto nCounter = 0; nCounter < bits - 1; nCounter++)
+    for (auto nCounter = 0; nCounter < 7; nCounter++)
     {
         long long int nSumofSLoss = 0;
         int nLossCount = 0;
