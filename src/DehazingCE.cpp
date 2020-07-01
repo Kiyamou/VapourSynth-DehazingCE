@@ -5,7 +5,7 @@
 
 constexpr float SQRT_3 = 1.733f;
 
-dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
@@ -16,11 +16,11 @@ dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit,
     m_PreviousFlag = bPrevFlag;
     m_PostFlag = bPosFlag;
 
-    // parameters for each cost (loss cost, temporal coherence cost)
+    // Parameters for each cost (loss cost, temporal coherence cost)
     Lambda1 = fL1;
     Lambda2 = fL2;  // only used in previous mode
 
-    // block size for transmission estimation
+    // Block size for transmission estimation
     TBlockSize = nTBlockSize;
     TransInit = fTransInit;
 
@@ -28,6 +28,9 @@ dehazing::dehazing(int nW, int nH, int nBits, int nTBlockSize, float fTransInit,
     GBlockSize = nGBlockSize;
     StepSize = 2;
     GSigma = 10.f;
+
+    // Block size for air estimation
+    ABlockSize = nABlockSize;
 
     // Specify the region of atmospheric light estimation
     TopLeftX = 0;
@@ -142,9 +145,9 @@ void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int s
             const auto pos = (j * width + i) * 3;
             const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f);
 
-            dst[pos]     = (T)m_pucGammaLUT[clamp((int)(((float)src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
-            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
-            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)(((float)src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
+            dst[pos]     = (T)m_pucGammaLUT[clamp((int)((src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
+            dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)((src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
+            dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)((src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
 
             // If transmission is less than 0.4, apply post processing because more dehazed block yields more artifacts
             if (i > nDisPos + nNumStep && m_pfTransmissionR[j * width + i - nDisPos] < 0.4)
@@ -339,7 +342,7 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
     memcpy(iplLowerLeft,  src + half_w * half_h * 6, half_w * half_h * 3 * sizeof(T));
     memcpy(iplLowerRight, src + half_w * half_h * 9, half_w * half_h * 3 * sizeof(T));
 
-    if (height * width > 200)
+    if (height * width > ABlockSize)
     {
         // compute the mean and std-dev in the sub-block
         T* iplR = new T[half_h * half_w];
@@ -485,8 +488,9 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
             {
                 const auto pos = (j * width + i) * 3;
                 // peak-r, peak-g, peak-b
-                int nDistance = int(sqrt((peak - src[pos]) * (peak - src[pos]) + (peak - src[pos + 1]) * (peak - src[pos + 1])
-                                         + (peak - src[pos + 2]) * (peak - src[pos + 2])));
+                int nDistance = (int)std::sqrt((float)(peak - src[pos]) * (peak - src[pos]) +
+                                               (float)(peak - src[pos + 1]) * (peak - src[pos + 1]) +
+                                               (float)(peak - src[pos + 2]) * (peak - src[pos + 2]));
                 if (nMinDistance > nDistance)
                 {
                     // atmospheric light value
