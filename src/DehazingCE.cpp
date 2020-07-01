@@ -235,7 +235,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
         long long int nSumofSLoss = 0;
         int nLossCount = 0;
         long long int nSumofSquaredOuts = 0;
-        int nSumofOuts = 0;
+        long long int nSumofOuts = 0;
 
         int half_peak = ((peak + 1) >> 1);
         for (auto y = nStartY; y < nEndY; y++)
