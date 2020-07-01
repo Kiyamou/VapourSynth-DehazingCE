@@ -5,7 +5,7 @@
 
 constexpr float SQRT_3 = 1.733f;
 
-dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
@@ -17,7 +17,7 @@ dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, 
     m_PostFlag = bPosFlag;
 
     // Parameters for each cost (loss cost, temporal coherence cost)
-    Lambda1 = fL1;
+    Lambda1 = dL1;
     Lambda2 = fL2;  // only used in previous mode
 
     // Block size for transmission estimation
@@ -220,7 +220,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
 {
     int nOutR, nOutG, nOutB;
     float fOptTrs;
-    float fCost, fMinCost, fMean;
+    double dCost, dMinCost, dMean;
 
     int nEndX = std::min(nStartX + TBlockSize, ref_width);
     int nEndY = std::min(nStartY + TBlockSize, ref_height);
@@ -232,10 +232,10 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
 
     for (auto nCounter = 0; nCounter < bits - 1; nCounter++)
     {
-        int nSumofSLoss = 0;
+        long long int nSumofSLoss = 0;
         int nLossCount = 0;
-        int nSumofSquaredOuts = 0;
-        int nSumofOuts = 0;
+        long long int nSumofSquaredOuts = 0;
+        long long int nSumofOuts = 0;
 
         int half_peak = ((peak + 1) >> 1);
         for (auto y = nStartY; y < nEndY; y++)
@@ -282,13 +282,13 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
             }
         }
 
-        fMean = (float)(nSumofOuts) / (float)(nNumberofPixels);
-        fCost = Lambda1 * (float)nSumofSLoss / (float)(nNumberofPixels)
-                -((float)nSumofSquaredOuts / (float)nNumberofPixels - fMean * fMean);
+        dMean = (double)nSumofOuts / nNumberofPixels;
+        dCost = Lambda1 * (double)nSumofSLoss / nNumberofPixels
+                -((double)nSumofSquaredOuts / nNumberofPixels - dMean * dMean);
 
-        if (nCounter == 0 || fMinCost > fCost)
+        if (nCounter == 0 || dMinCost > dCost)
         {
-            fMinCost = fCost;
+            dMinCost = dCost;
             fOptTrs = fTrans;
         }
 
