@@ -220,7 +220,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
 {
     int nOutR, nOutG, nOutB;
     float fOptTrs;
-    float fCost, fMinCost, fMean;
+    double dCost, dMinCost, dMean;
 
     int nEndX = std::min(nStartX + TBlockSize, ref_width);
     int nEndY = std::min(nStartY + TBlockSize, ref_height);
@@ -232,9 +232,9 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
 
     for (auto nCounter = 0; nCounter < bits - 1; nCounter++)
     {
-        int nSumofSLoss = 0;
+        long long int nSumofSLoss = 0;
         int nLossCount = 0;
-        int nSumofSquaredOuts = 0;
+        long long int nSumofSquaredOuts = 0;
         int nSumofOuts = 0;
 
         int half_peak = ((peak + 1) >> 1);
@@ -282,13 +282,13 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
             }
         }
 
-        fMean = (float)(nSumofOuts) / (float)(nNumberofPixels);
-        fCost = Lambda1 * (float)nSumofSLoss / (float)(nNumberofPixels)
-                -((float)nSumofSquaredOuts / (float)nNumberofPixels - fMean * fMean);
+		dMean = (double)nSumofOuts / nNumberofPixels;
+		dCost = Lambda1 * (double)nSumofSLoss / nNumberofPixels
+                -((double)nSumofSquaredOuts / nNumberofPixels - dMean * dMean);
 
-        if (nCounter == 0 || fMinCost > fCost)
+        if (nCounter == 0 || dMinCost > dCost)
         {
-            fMinCost = fCost;
+            dMinCost = dCost;
             fOptTrs = fTrans;
         }
 
