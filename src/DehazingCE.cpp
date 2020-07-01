@@ -3,6 +3,8 @@
 #include "DehazingCE.h"
 #include "Helper.hpp"
 
+constexpr float SQRT_3 = 1.733f;
+
 dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, float fL1, float fL2, int nGBlockSize)
 {
     width = nW;
@@ -314,7 +316,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
 template <typename T>
 void dehazing::AirlightEstimation(const T* src, int width, int height, int stride)
 {
-    int nMinDistance = peak * peak * 3;
+    int nMinDistance = (int)(peak * SQRT_3);
 
     int nMaxIndex;
     double dpScore[3];
@@ -486,8 +488,9 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
             {
                 const auto pos = (j * width + i) * 3;
                 // peak-r, peak-g, peak-b
-                int nDistance = (peak - src[pos]) * (peak - src[pos]) + (peak - src[pos + 1]) * (peak - src[pos + 1]) +
-                                (peak - src[pos + 2]) * (peak - src[pos + 2]);
+                int nDistance = (int)std::sqrt((float)(peak - src[pos]) * (peak - src[pos]) +
+                                               (float)(peak - src[pos + 1]) * (peak - src[pos + 1]) +
+                                               (float)(peak - src[pos + 2]) * (peak - src[pos + 2]));
                 if (nMinDistance > nDistance)
                 {
                     // atmospheric light value
