@@ -76,9 +76,9 @@ private:
     int BottomRightX;
     int BottomRightY;
 
-    int* m_pnRImg;
-    int* m_pnGImg;
-    int* m_pnBImg;
+    float* m_pfImageR;
+    float* m_pfImageG;
+    float* m_pfImageB;
 
     float* m_pfTransmission;   // preliminary transmission
     float* m_pfTransmissionR;  // refined transmission

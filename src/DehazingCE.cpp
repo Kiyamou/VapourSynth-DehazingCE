@@ -41,9 +41,9 @@ dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, 
     m_pfTransmission  = new float[width * height];
     m_pfTransmissionR = new float[width * height];
 
-    m_pnRImg = new int[width * height];
-    m_pnGImg = new int[width * height];
-    m_pnBImg = new int[width * height];
+    m_pfImageR = new float[width * height];
+    m_pfImageG = new float[width * height];
+    m_pfImageB = new float[width * height];
 
     m_pfGuidedLUT = new float[GBlockSize * GBlockSize];
 }
@@ -55,12 +55,12 @@ dehazing::~dehazing()
     if (m_pfTransmissionR != nullptr)
         delete[] m_pfTransmissionR;
 
-    if (m_pnRImg != nullptr)
-        delete[] m_pnRImg;
-    if (m_pnGImg != nullptr)
-        delete[] m_pnGImg;
-    if (m_pnBImg != nullptr)
-        delete[] m_pnBImg;
+    if (m_pfImageR != nullptr)
+        delete[] m_pfImageR;
+    if (m_pfImageG != nullptr)
+        delete[] m_pfImageG;
+    if (m_pfImageB != nullptr)
+        delete[] m_pfImageB;
 
     if (m_pfGuidedLUT != nullptr)
         delete[] m_pfGuidedLUT;
@@ -68,9 +68,9 @@ dehazing::~dehazing()
     m_pfTransmission = nullptr;
     m_pfTransmissionR = nullptr;
 
-    m_pnRImg = nullptr;
-    m_pnGImg = nullptr;
-    m_pnBImg = nullptr;
+    m_pfImageR = nullptr;
+    m_pfImageG = nullptr;
+    m_pfImageB = nullptr;
 
     m_pfGuidedLUT = nullptr;
 }
@@ -80,6 +80,18 @@ template <typename T>
 void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height)
 {
     float fEps = 0.001f;
+
+    // Converting to float point
+    for (auto j = 0; j < height; j++)
+    {
+        for (auto i = 0; i < width; i++)
+        {
+            const auto pos = (j * width + i) * 3;
+            m_pfImageR[i] = (float)src[pos];
+            m_pfImageG[i] = (float)src[pos + 1];
+            m_pfImageB[i] = (float)src[pos + 2];
+        }
+    }
 
     AirlightEstimation(src, width, height, stride);
     TransmissionEstimationColor(refpB, refpG, refpR, ref_width, ref_height);

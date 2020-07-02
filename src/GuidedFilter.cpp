@@ -234,10 +234,6 @@ void dehazing::BoxFilter(float* pfInArray1, float* pfInArray2, float* pfInArray3
  */
 void dehazing::GuidedFilter(int width, int height, float fEps)
 {
-    float* pfImageR = new float[width * height];
-    float* pfImageG = new float[width * height];
-    float* pfImageB = new float[width * height];
-
     float* pfInitN = new float[width * height];
     float* pfInitMeanIpR = new float[width * height];
     float* pfInitMeanIpG = new float[width * height];
@@ -283,13 +279,6 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
     float* pfB = new float[width * height];
     float* pfOutB = new float[width * height];
 
-    // Converting to float point
-    for (auto nIdx = 0; nIdx < width * height; nIdx++)
-    {
-        pfImageR[nIdx] = (float)m_pnRImg[nIdx];
-        pfImageG[nIdx] = (float)m_pnGImg[nIdx];
-        pfImageB[nIdx] = (float)m_pnBImg[nIdx];
-    }
     //////////////////////////////////////////////////////////////////////////
 
     // Make an integral image
@@ -297,15 +286,15 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
     {
         pfInitN[nIdx] = 1.f;
 
-        pfInitMeanIpR[nIdx] = pfImageR[nIdx] * m_pfTransmission[nIdx];
-        pfInitMeanIpG[nIdx] = pfImageG[nIdx] * m_pfTransmission[nIdx];
-        pfInitMeanIpB[nIdx] = pfImageB[nIdx] * m_pfTransmission[nIdx];
+        pfInitMeanIpR[nIdx] = m_pfImageR[nIdx] * m_pfTransmission[nIdx];
+        pfInitMeanIpG[nIdx] = m_pfImageG[nIdx] * m_pfTransmission[nIdx];
+        pfInitMeanIpB[nIdx] = m_pfImageB[nIdx] * m_pfTransmission[nIdx];
     }
 
     BoxFilter(pfInitN, GBlockSize, width, height, pfN);
     BoxFilter(m_pfTransmission, GBlockSize, width, height, pfMeanP);
 
-    BoxFilter(pfImageR, pfImageG, pfImageB, GBlockSize, width, height, pfMeanIr, pfMeanIg, pfMeanIb);
+    BoxFilter(m_pfImageR, m_pfImageG, m_pfImageB, GBlockSize, width, height, pfMeanIr, pfMeanIg, pfMeanIb);
 
     BoxFilter(pfInitMeanIpR, pfInitMeanIpG, pfInitMeanIpB, GBlockSize, width, height, pfMeanIpR, pfMeanIpG, pfMeanIpB);
 
@@ -331,12 +320,12 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
         pfCovEntire[nIdx * 3 + 1] = pfCovIpG[nIdx];
         pfCovEntire[nIdx * 3 + 2] = pfCovIpB[nIdx];
 
-        pfInitVarIrr[nIdx] = pfImageR[nIdx] * pfImageR[nIdx];
-        pfInitVarIrg[nIdx] = pfImageR[nIdx] * pfImageG[nIdx];
-        pfInitVarIrb[nIdx] = pfImageR[nIdx] * pfImageB[nIdx];
-        pfInitVarIgg[nIdx] = pfImageG[nIdx] * pfImageG[nIdx];
-        pfInitVarIgb[nIdx] = pfImageG[nIdx] * pfImageB[nIdx];
-        pfInitVarIbb[nIdx] = pfImageB[nIdx] * pfImageB[nIdx];
+        pfInitVarIrr[nIdx] = m_pfImageR[nIdx] * m_pfImageR[nIdx];
+        pfInitVarIrg[nIdx] = m_pfImageR[nIdx] * m_pfImageG[nIdx];
+        pfInitVarIrb[nIdx] = m_pfImageR[nIdx] * m_pfImageB[nIdx];
+        pfInitVarIgg[nIdx] = m_pfImageG[nIdx] * m_pfImageG[nIdx];
+        pfInitVarIgb[nIdx] = m_pfImageG[nIdx] * m_pfImageB[nIdx];
+        pfInitVarIbb[nIdx] = m_pfImageB[nIdx] * m_pfImageB[nIdx];
     }
 
     // Variance of I in each local patch: the matrix Sigma.
@@ -386,7 +375,7 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
 
     for (auto nIdx = 0; nIdx < width * height; nIdx++)
     {
-        m_pfTransmissionR[nIdx] = (pfOutA1[nIdx] * pfImageR[nIdx] + pfOutA2[nIdx] * pfImageG[nIdx] + pfOutA3[nIdx] * pfImageB[nIdx] + pfOutB[nIdx]) / pfN[nIdx];
+        m_pfTransmissionR[nIdx] = (pfOutA1[nIdx] * m_pfImageR[nIdx] + pfOutA2[nIdx] * m_pfImageG[nIdx] + pfOutA3[nIdx] * m_pfImageB[nIdx] + pfOutB[nIdx]) / pfN[nIdx];
     }
 
     delete[] pfInitN;
@@ -427,8 +416,4 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
     delete[] pfSigmaEntire;
     delete[] pfB;
     delete[] pfOutB;
-
-    delete[] pfImageR;
-    delete[] pfImageG;
-    delete[] pfImageB;
 }
