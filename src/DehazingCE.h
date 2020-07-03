@@ -18,7 +18,7 @@ public:
     void RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height);
 
     template <typename T>
-    void AirlightEstimation(const T* src, int width, int height, int stride);
+    void AirlightEstimation(const T* src, int _width, int _height, int stride);
 
     template <typename T>
     float NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height);

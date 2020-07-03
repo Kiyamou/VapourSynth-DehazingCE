@@ -314,7 +314,7 @@ float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const
         m_anAirlight: estimated atmospheric light value
  */
 template <typename T>
-void dehazing::AirlightEstimation(const T* src, int width, int height, int stride)
+void dehazing::AirlightEstimation(const T* src, int _width, int _height, int stride)
 {
     int nMinDistance = (int)(peak * SQRT_3);
 
@@ -329,8 +329,8 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
     float nMaxScore = 0.f;
 
     // 4 sub-block
-    int half_w = width / 2;
-    int half_h = height / 2;
+    int half_w = _width / 2;
+    int half_h = _height / 2;
 
     T* iplUpperLeft  = new T[half_w * half_h * 3];
     T* iplUpperRight = new T[half_w * half_h * 3];
@@ -342,7 +342,7 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
     memcpy(iplLowerLeft,  src + half_w * half_h * 6, half_w * half_h * 3 * sizeof(T));
     memcpy(iplLowerRight, src + half_w * half_h * 9, half_w * half_h * 3 * sizeof(T));
 
-    if (height * width > ABlockSize)
+    if (_width * _height > ABlockSize)
     {
         // compute the mean and std-dev in the sub-block
         T* iplR = new T[half_h * half_w];
@@ -482,11 +482,11 @@ void dehazing::AirlightEstimation(const T* src, int width, int height, int strid
     else
     {
         // select the atmospheric light value in the sub-block
-        for (auto j = 0; j < height; j++)
+        for (auto j = 0; j < _height; j++)
         {
-            for (auto i = 0; i < width; i++)
+            for (auto i = 0; i < _width; i++)
             {
-                const auto pos = (j * width + i) * 3;
+                const auto pos = (j * _width + i) * 3;
                 // peak-r, peak-g, peak-b
                 int nDistance = (int)std::sqrt((float)(peak - src[pos]) * (peak - src[pos]) +
                                                (float)(peak - src[pos + 1]) * (peak - src[pos + 1]) +
