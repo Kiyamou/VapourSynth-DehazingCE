@@ -345,12 +345,12 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
     if (_width * _height > ABlockSize)
     {
         // compute the mean and std-dev in the sub-block
+        T* iplR = new T[half_h * half_w + 1];
+        T* iplG = new T[half_h * half_w + 1];
+        T* iplB = new T[half_h * half_w + 1];
 
         //////////////////////////////////
         // upper left sub-block
-        T* iplR = new T[half_h * half_w];
-        T* iplG = new T[half_h * half_w];
-        T* iplB = new T[half_h * half_w];
 
         for (auto j = 0; j < half_h; j++)
         {
@@ -379,6 +379,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
 
         nMaxScore = afScore[0];
         nMaxIndex = 0;
+
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
 
         //////////////////////////////////
         // upper right sub-block
@@ -414,6 +418,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxIndex = 1;
         }
 
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
+
         //////////////////////////////////
         // lower left sub-block
 
@@ -447,6 +455,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxScore = afScore[2];
             nMaxIndex = 2;
         }
+        
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
 
         //////////////////////////////////
         // lower right sub-block
@@ -482,6 +494,14 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxIndex = 3;
         }
 
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
+
+        delete[] iplR;
+        delete[] iplG;
+        delete[] iplB;
+
         //////////////////////////////////
         // select the sub-block, which has maximum score
         switch (nMaxIndex)
@@ -495,10 +515,6 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         case 3:
             AirlightEstimation(iplLowerRight, half_w, half_h, stride / 2); break;
         }
-
-        delete[] iplR;
-        delete[] iplG;
-        delete[] iplB;
     }
     else
     {
