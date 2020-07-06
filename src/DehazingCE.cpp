@@ -348,28 +348,28 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
 
         //////////////////////////////////
         // upper left sub-block
-        T* iplR_ul = new T[half_h * half_w];
-        T* iplG_ul = new T[half_h * half_w];
-        T* iplB_ul = new T[half_h * half_w];
+        T* iplR = new T[half_h * half_w];
+        T* iplG = new T[half_h * half_w];
+        T* iplB = new T[half_h * half_w];
 
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB_ul[i] = iplUpperLeft[pos];
-                iplG_ul[i] = iplUpperLeft[pos + 1];
-                iplR_ul[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplUpperLeft[pos];
+                iplG[i] = iplUpperLeft[pos + 1];
+                iplR[i] = iplUpperLeft[pos + 2];
             }
 
-            iplB_ul += half_w;
-            iplG_ul += half_w;
-            iplR_ul += half_w;
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
-        meanStdDev(iplR_ul, dpMean[0], dpStds[0], variance[0], half_w, half_h);
-        meanStdDev(iplG_ul, dpMean[1], dpStds[1], variance[1], half_w, half_h);
-        meanStdDev(iplB_ul, dpMean[2], dpStds[2], variance[2], half_w, half_h);
+        meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
+        meanStdDev(iplG, dpMean[1], dpStds[1], variance[1], half_w, half_h);
+        meanStdDev(iplB, dpMean[2], dpStds[2], variance[2], half_w, half_h);
         // dpScore: mean - std-dev
         dpScore[0] = dpMean[0] - dpStds[0];
         dpScore[1] = dpMean[1] - dpStds[1];
@@ -380,34 +380,27 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         nMaxScore = afScore[0];
         nMaxIndex = 0;
 
-        delete[] iplR_ul;
-        delete[] iplG_ul;
-        delete[] iplB_ul;
-
         //////////////////////////////////
         // upper right sub-block
-        T* iplR_ur = new T[half_h * half_w];
-        T* iplG_ur = new T[half_h * half_w];
-        T* iplB_ur = new T[half_h * half_w];
 
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB_ur[i] = iplUpperLeft[pos];
-                iplG_ur[i] = iplUpperLeft[pos + 1];
-                iplR_ur[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplUpperLeft[pos];
+                iplG[i] = iplUpperLeft[pos + 1];
+                iplR[i] = iplUpperLeft[pos + 2];
             }
 
-            iplB_ur += half_w;
-            iplG_ur += half_w;
-            iplR_ur += half_w;
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
-        meanStdDev(iplR_ur, dpMean[0], dpStds[0], variance[0], half_w, half_h);
-        meanStdDev(iplG_ur, dpMean[1], dpStds[1], variance[1], half_w, half_h);
-        meanStdDev(iplB_ur, dpMean[2], dpStds[2], variance[2], half_w, half_h);
+        meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
+        meanStdDev(iplG, dpMean[1], dpStds[1], variance[1], half_w, half_h);
+        meanStdDev(iplB, dpMean[2], dpStds[2], variance[2], half_w, half_h);
 
         dpScore[0] = dpMean[0] - dpStds[0];
         dpScore[1] = dpMean[1] - dpStds[1];
@@ -421,34 +414,27 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxIndex = 1;
         }
 
-        delete[] iplR_ur;
-        delete[] iplG_ur;
-        delete[] iplB_ur;
-
         //////////////////////////////////
         // lower left sub-block
-        T* iplR_ll = new T[half_h * half_w];
-        T* iplG_ll = new T[half_h * half_w];
-        T* iplB_ll = new T[half_h * half_w];
 
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB_ll[i] = iplUpperLeft[pos];
-                iplG_ll[i] = iplUpperLeft[pos + 1];
-                iplR_ll[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplUpperLeft[pos];
+                iplG[i] = iplUpperLeft[pos + 1];
+                iplR[i] = iplUpperLeft[pos + 2];
             }
 
-            iplB_ll += half_w;
-            iplG_ll += half_w;
-            iplR_ll += half_w;
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
-        meanStdDev(iplR_ll, dpMean[0], dpStds[0], variance[0], half_w, half_h);
-        meanStdDev(iplG_ll, dpMean[1], dpStds[1], variance[1], half_w, half_h);
-        meanStdDev(iplB_ll, dpMean[2], dpStds[2], variance[2], half_w, half_h);
+        meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
+        meanStdDev(iplG, dpMean[1], dpStds[1], variance[1], half_w, half_h);
+        meanStdDev(iplB, dpMean[2], dpStds[2], variance[2], half_w, half_h);
 
         dpScore[0] = dpMean[0] - dpStds[0];
         dpScore[1] = dpMean[1] - dpStds[1];
@@ -462,34 +448,27 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxIndex = 2;
         }
 
-        delete[] iplR_ll;
-        delete[] iplG_ll;
-        delete[] iplB_ll;
-
         //////////////////////////////////
         // lower right sub-block
-        T* iplR_lr = new T[half_h * half_w];
-        T* iplG_lr = new T[half_h * half_w];
-        T* iplB_lr = new T[half_h * half_w];
 
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB_lr[i] = iplUpperLeft[pos];
-                iplG_lr[i] = iplUpperLeft[pos + 1];
-                iplR_lr[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplUpperLeft[pos];
+                iplG[i] = iplUpperLeft[pos + 1];
+                iplR[i] = iplUpperLeft[pos + 2];
             }
 
-            iplB_lr += half_w;
-            iplG_lr += half_w;
-            iplR_lr += half_w;
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
-        meanStdDev(iplR_lr, dpMean[0], dpStds[0], variance[0], half_w, half_h);
-        meanStdDev(iplG_lr, dpMean[1], dpStds[1], variance[1], half_w, half_h);
-        meanStdDev(iplB_lr, dpMean[2], dpStds[2], variance[2], half_w, half_h);
+        meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
+        meanStdDev(iplG, dpMean[1], dpStds[1], variance[1], half_w, half_h);
+        meanStdDev(iplB, dpMean[2], dpStds[2], variance[2], half_w, half_h);
 
         dpScore[0] = dpMean[0] - dpStds[0];
         dpScore[1] = dpMean[1] - dpStds[1];
@@ -502,10 +481,6 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxScore = afScore[3];
             nMaxIndex = 3;
         }
-
-        delete[] iplR_lr;
-        delete[] iplG_lr;
-        delete[] iplB_lr;
 
         //////////////////////////////////
         // select the sub-block, which has maximum score
@@ -520,6 +495,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         case 3:
             AirlightEstimation(iplLowerRight, half_w, half_h, stride / 2); break;
         }
+
+        delete[] iplR;
+        delete[] iplG;
+        delete[] iplB;
     }
     else
     {
