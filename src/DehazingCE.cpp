@@ -349,9 +349,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         T* iplG = new T[half_h * half_w + 1];
         T* iplB = new T[half_h * half_w + 1];
 
-        //////////////////////////////////
         // upper left sub-block
-
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -370,6 +368,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
         meanStdDev(iplG, dpMean[1], dpStds[1], variance[1], half_w, half_h);
         meanStdDev(iplB, dpMean[2], dpStds[2], variance[2], half_w, half_h);
+
         // dpScore: mean - std-dev
         dpScore[0] = dpMean[0] - dpStds[0];
         dpScore[1] = dpMean[1] - dpStds[1];
@@ -384,9 +383,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-        //////////////////////////////////
         // upper right sub-block
-
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -422,9 +419,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-        //////////////////////////////////
         // lower left sub-block
-
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -460,9 +455,8 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-        //////////////////////////////////
-        // lower right sub-block
 
+        // lower right sub-block
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -502,7 +496,6 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         delete[] iplG;
         delete[] iplB;
 
-        //////////////////////////////////
         // select the sub-block, which has maximum score
         switch (nMaxIndex)
         {
