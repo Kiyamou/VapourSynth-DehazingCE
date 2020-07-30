@@ -11,7 +11,7 @@ Still in development, support 8-16 bit RGB.
 ## Usage
 
 ```python
-core.dhce.Dehazing(clip src[, clip ref, float trans, int trans_size, int guide_size, float gamma, bool post])
+core.dhce.Dehazing(clip src[, clip ref, float trans, int air_size, int guide_size, int trans_size, float lamda, float gamma, bool post])
 ```
 
 * ***src***
@@ -25,12 +25,18 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int trans_size, int guide_s
     * Optional parameter. *Default: 0.3*.
     * Initial value of transmission.
     * The larger the initial value, the stronger the effect of dehazing, but the contrast may be too high.
-* ***trans_size***
-    * Optional parameter. *Default: 16*.
-    * Block size in transmission estimation.
+* ***air_size***
+    * Optional parameter. *Default: 200*.
+    * Block size in airlight estimation.
 * ***guide_size***
     * Optional parameter. *Default: 40*.
     * Block size in guide filter.
+* ***trans_size***
+    * Optional parameter. *Default: 16*.
+    * Block size in transmission estimation.
+* ***lamda***
+    * Optional parameter. *Default: 5.0*.
+    * Empirical parameter for calculating pixel out-of-bounds loss. Generally do not need to be modified.
 * ***gamma***
     * Optional parameter. *Default: 0.7*.
     * Increase brightness to avoid image darkening after dehazing.
