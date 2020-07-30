@@ -345,9 +345,9 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
     if (_width * _height > ABlockSize)
     {
         // compute the mean and std-dev in the sub-block
-        T* iplR = new T[half_h * half_w];
-        T* iplG = new T[half_h * half_w];
-        T* iplB = new T[half_h * half_w];
+        T* iplR = new T[half_h * half_w + 1];
+        T* iplG = new T[half_h * half_w + 1];
+        T* iplB = new T[half_h * half_w + 1];
 
         //////////////////////////////////
         // upper left sub-block
@@ -360,6 +360,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
                 iplG[i] = iplUpperLeft[pos + 1];
                 iplR[i] = iplUpperLeft[pos + 2];
             }
+            
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
         meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
@@ -376,6 +380,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         nMaxIndex = 0;
 
         //////////////////////////////////
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
+
         // upper right sub-block
         for (auto j = 0; j < half_h; j++)
         {
@@ -386,6 +394,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
                 iplG[i] = iplUpperRight[pos + 1];
                 iplR[i] = iplUpperRight[pos + 2];
             }
+
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
         meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
@@ -405,6 +417,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         }
 
         //////////////////////////////////
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
+
         // lower left sub-block
         for (auto j = 0; j < half_h; j++)
         {
@@ -415,6 +431,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
                 iplG[i] = iplLowerLeft[pos + 1];
                 iplR[i] = iplLowerLeft[pos + 2];
             }
+
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
         meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
@@ -434,6 +454,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         }
 
         //////////////////////////////////
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
+
         // lower right sub-block
         for (auto j = 0; j < half_h; j++)
         {
@@ -444,6 +468,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
                 iplG[i] = iplLowerRight[pos + 1];
                 iplR[i] = iplLowerRight[pos + 2];
             }
+
+            iplB += half_w;
+            iplG += half_w;
+            iplR += half_w;
         }
 
         meanStdDev(iplR, dpMean[0], dpStds[0], variance[0], half_w, half_h);
@@ -474,6 +502,10 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         case 3:
             AirlightEstimation(iplLowerRight, half_w, half_h, stride / 2); break;
         }
+
+        iplB -= half_h * half_w;
+        iplG -= half_h * half_w;
+        iplR -= half_h * half_w;
 
         delete[] iplR;
         delete[] iplG;
