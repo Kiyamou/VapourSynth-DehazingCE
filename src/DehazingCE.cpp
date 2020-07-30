@@ -389,9 +389,9 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB[i] = iplUpperLeft[pos];
-                iplG[i] = iplUpperLeft[pos + 1];
-                iplR[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplUpperRight[pos];
+                iplG[i] = iplUpperRight[pos + 1];
+                iplR[i] = iplUpperRight[pos + 2];
             }
 
             iplB += half_w;
@@ -425,9 +425,9 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB[i] = iplUpperLeft[pos];
-                iplG[i] = iplUpperLeft[pos + 1];
-                iplR[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplLowerLeft[pos];
+                iplG[i] = iplLowerLeft[pos + 1];
+                iplR[i] = iplLowerLeft[pos + 2];
             }
 
             iplB += half_w;
@@ -455,16 +455,15 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-
         // lower right sub-block
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
             {
                 const auto pos = (j * half_w + i) * 3;
-                iplB[i] = iplUpperLeft[pos];
-                iplG[i] = iplUpperLeft[pos + 1];
-                iplR[i] = iplUpperLeft[pos + 2];
+                iplB[i] = iplLowerRight[pos];
+                iplG[i] = iplLowerRight[pos + 1];
+                iplR[i] = iplLowerRight[pos + 2];
             }
 
             iplB += half_w;
