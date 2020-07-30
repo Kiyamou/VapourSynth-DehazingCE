@@ -34,13 +34,13 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
     int ref_stride = vsapi->getStride(ref, 0) / sizeof(T);
 
     //// Convert RGB to 1-D ararry ////
-    const T* srcpR = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 0));
+    const T* srcpB = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 0));
     const T* srcpG = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 1));
-    const T* srcpB = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 2));
+    const T* srcpR = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 2));
 
-    const T* refpR = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 0));
+    const T* refpB = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 0));
     const T* refpG = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 1));
-    const T* refpB = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 2));
+    const T* refpR = reinterpret_cast<const T*>(vsapi->getReadPtr(ref, 2));
 
     // Interleaved
     T* srcInterleaved = new (std::nothrow) T[(d->vi->width) * d->vi->height * 3];

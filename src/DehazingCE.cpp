@@ -112,7 +112,7 @@ void dehazing::RestoreImage(const T* src, T* dst, int width, int height, int str
             {
                 // I' = (I - Airlight) / Transmission + Airlight and Gamma correction using Lut
                 const auto pos = (j * width + i) * 3;
-                const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
+                const float transmission = clamp(m_pfTransmission[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
 
                 dst[pos]     = (T)m_pucGammaLUT[clamp((int)((src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
                 dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)((src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
@@ -180,7 +180,7 @@ void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int s
 }
 
 template <typename T>
-void dehazing::TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int ref_width, int ref_height)
+void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int ref_width, int ref_height)
 {
     for (auto y = 0; y < ref_height; y += TBlockSize)
     {
@@ -216,7 +216,7 @@ void dehazing::TransmissionEstimationColor(const T* pnImageR, const T* pnImageG,
         fOptTrs
  */
 template <typename T>
-float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height)
+float dehazing::NFTrsEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int nStartX, int nStartY, int ref_width, int ref_height)
 {
     int nOutR, nOutG, nOutB;
     float fOptTrs;
@@ -345,9 +345,9 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
     if (_width * _height > ABlockSize)
     {
         // compute the mean and std-dev in the sub-block
-        T* iplR = new T[half_h * half_w + 1];
-        T* iplG = new T[half_h * half_w + 1];
         T* iplB = new T[half_h * half_w + 1];
+        T* iplG = new T[half_h * half_w + 1];
+        T* iplR = new T[half_h * half_w + 1];
 
         //////////////////////////////////
         // upper left sub-block
