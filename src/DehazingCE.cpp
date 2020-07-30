@@ -180,13 +180,13 @@ void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int s
 }
 
 template <typename T>
-void dehazing::TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int ref_width, int ref_height)
+void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int ref_width, int ref_height)
 {
     for (auto y = 0; y < ref_height; y += TBlockSize)
     {
         for (auto x = 0; x < ref_width; x += TBlockSize)
         {
-            float fTrans = NFTrsEstimationColor(pnImageR, pnImageG, pnImageB, x, y, ref_width, ref_height);
+            float fTrans = NFTrsEstimationColor(pnImageB, pnImageG, pnImageR, x, y, ref_width, ref_height);
             for (auto yStep = y; yStep < y + TBlockSize; yStep++)
             {
                 for (auto xStep = x; xStep < x + TBlockSize; xStep++)
@@ -216,7 +216,7 @@ void dehazing::TransmissionEstimationColor(const T* pnImageR, const T* pnImageG,
         fOptTrs
  */
 template <typename T>
-float dehazing::NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height)
+float dehazing::NFTrsEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int nStartX, int nStartY, int ref_width, int ref_height)
 {
     int nOutR, nOutG, nOutB;
     float fOptTrs;
