@@ -29,10 +29,6 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
     int height = vsapi->getFrameHeight(src, 0);
     int stride = vsapi->getStride(dst, 0) / sizeof(T);
 
-    int ref_width = vsapi->getFrameWidth(ref, 0);
-    int ref_height = vsapi->getFrameHeight(ref, 0);
-    int ref_stride = vsapi->getStride(ref, 0) / sizeof(T);
-
     //// Convert RGB to 1-D ararry ////
     const T* srcpR = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 0));
     const T* srcpG = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 1));
@@ -60,7 +56,7 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
         srcpR += stride;
     }
 
-    d->dehazing_clip->RemoveHaze((const T*)srcInterleaved, refpB, refpG, refpR, dstInterleaved, stride, ref_width, ref_height);
+    d->dehazing_clip->RemoveHaze((const T*)srcInterleaved, refpB, refpG, refpR, dstInterleaved, stride);
 
     //// change back from Interleaved
     T* VS_RESTRICT dstpR = reinterpret_cast<T*>(vsapi->getWritePtr(dst, 0));
@@ -169,6 +165,9 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
                 throw std::string("input clip and clip \"ref\" must have the same number of frames");
         }
 
+        int ref_width = d->rvi->width;
+        int ref_height = d->rvi->height;
+
         int ABlockSize = int64ToIntS(vsapi->propGetInt(in, "air_size", 0, &err));
         if (err)
             ABlockSize = 200;
@@ -197,7 +196,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         if (err)
             PostFlag = false;
 
-        d->dehazing_clip = new dehazing(width, height, bits, ABlockSize, TBlockSize, TransInit, false, PostFlag, lamdaA, 1.f, GBlockSize);
+        d->dehazing_clip = new dehazing(width, height, ref_width, ref_height, bits, ABlockSize, TBlockSize, TransInit, false, PostFlag, lamdaA, 1.f, GBlockSize);
 
         //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
         //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()

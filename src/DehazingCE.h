@@ -10,11 +10,11 @@
 class dehazing
 {
 public:
-    dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize);
+    dehazing(int nW, int nH, int n_refW, int n_refH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize);
     ~dehazing();
 
     template <typename T>
-    void RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height);
+    void RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride);
 
     void MakeExpLUT();
     void GuideLUTMaker();
@@ -25,10 +25,12 @@ private:
     void AirlightEstimation(const T* src, int _width, int _height, int stride);
 
     template <typename T>
-    float NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY, int ref_width, int ref_height);
+    float NFTrsEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int nStartX, int nStartY);
+
+    void UpsampleTransmission();
 
     template <typename T>
-    void TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB, int ref_width, int ref_height);
+    void TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB);
 
     template <typename T>
     void PostProcessing(const T* src, T* dst, int width, int height, int stride);  // Called by RestoreImage();
@@ -44,6 +46,9 @@ private:
 private:
     int width;
     int height;
+    int ref_width;
+    int ref_height;
+
     int peak;
     int bits;
 
@@ -82,6 +87,7 @@ private:
 
     float* m_pfTransmission;   // preliminary transmission
     float* m_pfTransmissionR;  // refined transmission
+    float* m_pfSmallTrans;
 
     float ExpLUT[65536];
     float m_pucGammaLUT[65536];

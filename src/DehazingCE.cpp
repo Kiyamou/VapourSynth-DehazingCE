@@ -5,10 +5,13 @@
 
 constexpr float SQRT_3 = 1.733f;
 
-dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize)
+dehazing::dehazing(int nW, int nH, int n_refW, int n_refH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize)
 {
     width = nW;
     height = nH;
+    ref_width = n_refW;
+    ref_height = n_refH;
+
     peak = (1 << nBits) - 1;
     bits = nBits;
 
@@ -40,6 +43,7 @@ dehazing::dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, 
 
     m_pfTransmission  = new float[width * height];
     m_pfTransmissionR = new float[width * height];
+    m_pfSmallTrans    = new float[ref_width * ref_height];
 
     m_pnRImg = new int[width * height];
     m_pnGImg = new int[width * height];
@@ -54,6 +58,8 @@ dehazing::~dehazing()
         delete[] m_pfTransmission;
     if (m_pfTransmissionR != nullptr)
         delete[] m_pfTransmissionR;
+    if (m_pfSmallTrans != nullptr)
+        delete[] m_pfSmallTrans;
 
     if (m_pnRImg != nullptr)
         delete[] m_pnRImg;
@@ -67,6 +73,7 @@ dehazing::~dehazing()
 
     m_pfTransmission = nullptr;
     m_pfTransmissionR = nullptr;
+    m_pfSmallTrans = nullptr;
 
     m_pnRImg = nullptr;
     m_pnGImg = nullptr;
@@ -77,12 +84,13 @@ dehazing::~dehazing()
 
 
 template <typename T>
-void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height)
+void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride)
 {
     float fEps = 0.001f;
 
     AirlightEstimation(src, width, height, stride);
-    TransmissionEstimationColor(refpB, refpG, refpR, ref_width, ref_height);
+    TransmissionEstimationColor(refpB, refpG, refpR);
+    UpsampleTransmission();
     GuidedFilter(width, height, fEps);
     RestoreImage(src, dst, width, height, stride);
 }
@@ -180,24 +188,51 @@ void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int s
 }
 
 template <typename T>
-void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int ref_width, int ref_height)
+void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR)
 {
     for (auto y = 0; y < ref_height; y += TBlockSize)
     {
         for (auto x = 0; x < ref_width; x += TBlockSize)
         {
-            float fTrans = NFTrsEstimationColor(pnImageB, pnImageG, pnImageR, x, y, ref_width, ref_height);
+            float fTrans = NFTrsEstimationColor(pnImageB, pnImageG, pnImageR, x, y);
             for (auto yStep = y; yStep < y + TBlockSize; yStep++)
             {
                 for (auto xStep = x; xStep < x + TBlockSize; xStep++)
                 {
                     int ly = std::min(yStep, ref_height - 1);
                     int lx = std::min(xStep, ref_width - 1);
-                    m_pfTransmission[ly * ref_width + lx] = fTrans;
+                    m_pfSmallTrans[ly * ref_width + lx] = fTrans;
                 }
             }
         }
     }
+}
+
+
+/*
+	Function: UpsampleImage
+	Description: upsample the fixed sized transmission to original size
+
+	Parameters:(hidden)
+		m_pfSmallTrans - input transmission (ref clip size)
+	Return:
+		m_pfTransmission - output transmission
+
+*/
+void dehazing::UpsampleTransmission()
+{
+	// Upsample ratio
+	float fRatioX = (float)ref_width / width;
+	float fRatioY = (float)ref_height / height;
+
+	for(auto j = 0; j < height; j++)
+	{
+		for(auto i = 0; i < width; i++)
+		{
+			// Upsample variable, from m_pfSmallTrans to m_pfTransmission
+			m_pfTransmission[j * width + i] = m_pfSmallTrans[(int)(j * fRatioY) * ref_width + (int)(i * fRatioX)];
+		}
+	}
 }
 
 
@@ -216,7 +251,7 @@ void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG,
         fOptTrs
  */
 template <typename T>
-float dehazing::NFTrsEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int nStartX, int nStartY, int ref_width, int ref_height)
+float dehazing::NFTrsEstimationColor(const T* pnImageB, const T* pnImageG, const T* pnImageR, int nStartX, int nStartY)
 {
     int nOutR, nOutG, nOutB;
     float fOptTrs;
@@ -360,7 +395,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
                 iplG[i] = iplUpperLeft[pos + 1];
                 iplR[i] = iplUpperLeft[pos + 2];
             }
-            
+
             iplB += half_w;
             iplG += half_w;
             iplR += half_w;
