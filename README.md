@@ -20,6 +20,7 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int trans_size, int guide_s
     * Support 8-16 bit RGB.
 * ***ref***
     * Optional parameter. *Default: src*.
+    * According to the original code of the algorithm author and my test, **the size of ref clip recommends to set as 320 * 240**, which can avoid uneven lighting to a certain degree (However, it may be only helpful when the input size is more larger than 320 * 240).
 * ***trans***
     * Optional parameter. *Default: 0.3*.
     * Initial value of transmission.
@@ -41,11 +42,12 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int trans_size, int guide_s
 
 | Before dehazing | After dehazing |
 | :-------------: | :------------: |
-| <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/06/13/oxBebyIunc97gOQ.jpg"> |
+| <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/07/30/2bXcZkMaIsy3rzm.jpg"> |
 | <img width="360" src="https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg"> | <img width="360" src="https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg"> |
 
-*The first image is from original paper. (Dehazing parameters: trans=0.4, gamma=0.6)*
-*The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: trans=0.3, gamma=0.7)*
+*The first image is from original paper. (Dehazing parameters: ref size: 320 * 240, trans=0.35, gamma=0.65)*
+
+*The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: ref size: same with input, trans=0.3, gamma=0.7)*
 
 ## License
 
