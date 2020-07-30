@@ -11,12 +11,16 @@ class dehazing
 {
 public:
     dehazing(int nW, int nH, int nBits, int nABlockSize, int nTBlockSize, float fTransInit, bool bPrevFlag, bool bPosFlag, double dL1, float fL2, int nGBlockSize);
-
     ~dehazing();
 
     template <typename T>
     void RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride, int ref_width, int ref_height);
 
+    void MakeExpLUT();
+    void GuideLUTMaker();
+    void GammaLUTMaker(float fParameter);
+
+private:
     template <typename T>
     void AirlightEstimation(const T* src, int _width, int _height, int stride);
 
@@ -36,10 +40,6 @@ public:
     void BoxFilter(float* pfInArray, int nR, int nWid, int nHei, float*& fOutArray);
     void BoxFilter(float* pfInArray1, float* pfInArray2, float* pfInArray3, int nR, int nWid, int nHei, float*& pfOutArray1, float*& pfOutArray2, float*& pfOutArray3);
     void GuidedFilter(int nW, int nH, float fEps);
-
-    void MakeExpLUT();
-    void GuideLUTMaker();
-    void GammaLUTMaker(float fParameter);
 
 private:
     int width;
