@@ -11,7 +11,7 @@ Still in development, support 8-16 bit RGB.
 ## Usage
 
 ```python
-core.dhce.Dehazing(clip src[, clip ref, float trans, int air_size, int guide_size, int trans_size, float lamda, float gamma, bool post])
+core.dhce.Dehazing(clip src[, clip ref, float trans, float gamma, int air_size, int trans_size, int guide_size, bool post, float lamda])
 ```
 
 * ***src***
@@ -25,24 +25,24 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int air_size, int guide_siz
     * Optional parameter. *Default: 0.3*.
     * Initial value of transmission.
     * The larger the initial value, the stronger the effect of dehazing, but the contrast may be too high.
+* ***gamma***
+    * Optional parameter. *Default: 1.5*.
+    * Increase brightness to avoid image darkening after dehazing.
 * ***air_size***
     * Optional parameter. *Default: 200*.
     * Block size in airlight estimation.
-* ***guide_size***
-    * Optional parameter. *Default: 40*.
-    * Block size in guide filter.
 * ***trans_size***
     * Optional parameter. *Default: 16*.
     * Block size in transmission estimation.
-* ***lamda***
-    * Optional parameter. *Default: 5.0*.
-    * Empirical parameter for calculating pixel out-of-bounds loss. Generally do not need to be modified.
-* ***gamma***
-    * Optional parameter. *Default: 0.7*.
-    * Increase brightness to avoid image darkening after dehazing.
+* ***guide_size***
+    * Optional parameter. *Default: 40*.
+    * Block size in guide filter.
 * ***post***
     * Optional parameter. *Default: False*.
     * Whether to post-process.
+* ***lamda***
+    * Optional parameter. *Default: 5.0*.
+    * Empirical parameter for calculating pixel out-of-bounds loss. Generally do not need to be modified.
 
 ## Usage
 
@@ -61,9 +61,9 @@ res = core.dhce.DehazingCE(src, ref, trans=..., gamma=..., ...)
 | <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/07/30/2bXcZkMaIsy3rzm.jpg"> |
 | <img width="360" src="https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg"> | <img width="360" src="https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg"> |
 
-*The first image is from original paper. (Dehazing parameters: ref size: 320 * 240, trans=0.35, gamma=0.65)*
+*The first image is from original paper. (Dehazing parameters: ref size: 320 * 240, trans=0.35, gamma=1/0.65)*
 
-*The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: ref size: same with input, trans=0.3, gamma=0.7)*
+*The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: ref size: same with input, trans=0.3, gamma=1/0.7)*
 
 ## Build
 

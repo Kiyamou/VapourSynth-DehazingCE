@@ -66,6 +66,6 @@ void dehazing::GammaLUTMaker(float fParameter)
 {
     for (auto i = 0; i < peak + 1; i++)
     {
-        m_pucGammaLUT[i] = pow((i / (float)peak), fParameter) * (float)peak;
+        m_pucGammaLUT[i] = pow((i / (float)peak), 1.f / fParameter) * (float)peak;
     }
 }

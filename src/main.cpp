@@ -168,33 +168,33 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
         int ref_width = d->rvi->width;
         int ref_height = d->rvi->height;
 
+        float TransInit = (float)(vsapi->propGetFloat(in, "trans", 0, &err));
+        if (err)
+            TransInit = 0.3f;
+
+		float gamma = (float)(vsapi->propGetFloat(in, "gamma", 0, &err));
+        if (err)
+            gamma = 1.5f;
+
         int ABlockSize = int64ToIntS(vsapi->propGetInt(in, "air_size", 0, &err));
         if (err)
             ABlockSize = 200;
-
-        int GBlockSize = int64ToIntS(vsapi->propGetInt(in, "guide_size", 0, &err));
-        if (err)
-            GBlockSize = 40;
 
         int TBlockSize = int64ToIntS(vsapi->propGetInt(in, "trans_size", 0, &err));
         if (err)
             TBlockSize = 16;
 
-        float TransInit = (float)(vsapi->propGetFloat(in, "trans", 0, &err));
+        int GBlockSize = int64ToIntS(vsapi->propGetInt(in, "guide_size", 0, &err));
         if (err)
-            TransInit = 0.3f;
-
-        double lamdaA = vsapi->propGetFloat(in, "lamda", 0, &err);
-        if (err)
-            lamdaA = 5.0;
-
-		float gamma = (float)(vsapi->propGetFloat(in, "gamma", 0, &err));
-        if (err)
-            gamma = 0.7f;
+            GBlockSize = 40;
 
         bool PostFlag = vsapi->propGetInt(in, "post", 0, &err) == 0 ? false : true;
         if (err)
             PostFlag = false;
+
+        double lamdaA = vsapi->propGetFloat(in, "lamda", 0, &err);
+        if (err)
+            lamdaA = 5.0;
 
         d->dehazing_clip = new dehazing(width, height, ref_width, ref_height, bits, ABlockSize, TBlockSize, TransInit, false, PostFlag, lamdaA, 1.f, GBlockSize);
 
@@ -220,11 +220,11 @@ VS_EXTERNAL_API(void) VapourSynthPluginInit(VSConfigPlugin configFunc, VSRegiste
         "src:clip;"
         "ref:clip:opt;"
         "trans:float:opt;"
-        "air_size:int:opt;"
-        "guide_size:int:opt;"
-        "trans_size:int:opt;"
-        "lamda:float:opt;"
         "gamma:float:opt;"
-        "post:int:opt",
+        "air_size:int:opt;"
+        "trans_size:int:opt;"
+        "guide_size:int:opt;"
+        "post:int:opt;"
+        "lamda:float:opt",
         filterCreate, 0, plugin);
 }
