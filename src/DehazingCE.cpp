@@ -54,32 +54,15 @@ dehazing::dehazing(int nW, int nH, int n_refW, int n_refH, int nBits, int nABloc
 
 dehazing::~dehazing()
 {
-    if (m_pfTransmission != nullptr)
-        delete[] m_pfTransmission;
-    if (m_pfTransmissionR != nullptr)
-        delete[] m_pfTransmissionR;
-    if (m_pfSmallTrans != nullptr)
-        delete[] m_pfSmallTrans;
+    delete[] m_pfTransmission;
+    delete[] m_pfTransmissionR;
+    delete[] m_pfSmallTrans;
 
-    if (m_pnRImg != nullptr)
-        delete[] m_pnRImg;
-    if (m_pnGImg != nullptr)
-        delete[] m_pnGImg;
-    if (m_pnBImg != nullptr)
-        delete[] m_pnBImg;
+    delete[] m_pnRImg;
+    delete[] m_pnGImg;
+    delete[] m_pnBImg;
 
-    if (m_pfGuidedLUT != nullptr)
-        delete[] m_pfGuidedLUT;
-
-    m_pfTransmission = nullptr;
-    m_pfTransmissionR = nullptr;
-    m_pfSmallTrans = nullptr;
-
-    m_pnRImg = nullptr;
-    m_pnGImg = nullptr;
-    m_pnBImg = nullptr;
-
-    m_pfGuidedLUT = nullptr;
+    delete[] m_pfGuidedLUT;
 }
 
 
