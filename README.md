@@ -44,6 +44,16 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int air_size, int guide_siz
     * Optional parameter. *Default: False*.
     * Whether to post-process.
 
+## Usage
+
+Recommended to set small size ref clip.
+
+```python
+src = ...
+ref = core.resize.Spline36(src, 320, 240)
+res = core.dhce.DehazingCE(src, ref, trans=..., gamma=..., ...)
+```
+
 ## Example
 
 | Before dehazing | After dehazing |
@@ -54,6 +64,28 @@ core.dhce.Dehazing(clip src[, clip ref, float trans, int air_size, int guide_siz
 *The first image is from original paper. (Dehazing parameters: ref size: 320 * 240, trans=0.35, gamma=0.65)*
 
 *The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: ref size: same with input, trans=0.3, gamma=0.7)*
+
+## Build
+
+### Windows
+
+Default VapourSynth include path is `C:/Program Files/VapourSynth/sdk/include`, if not, set with `-DVAPOURSYNTH_INCLUDE_DIR`.
+
+```shell
+mkdir build && cd build
+cmake -G "NMake Makefiles" ..
+cmake --build .
+```
+
+### Linux
+
+Default VapourSynth include path is `/usr/local/include`, if not, set with `-DVAPOURSYNTH_INCLUDE_DIR`.
+
+```shell
+mkdir build && cd build
+cmake ..
+cmake --build .
+```
 
 ## License
 
