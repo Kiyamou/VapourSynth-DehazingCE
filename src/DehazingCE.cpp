@@ -89,57 +89,43 @@ void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T*
 template <typename T>
 void dehazing::RestoreImage(const T* src, T* dst, int width, int height, int stride)
 {
-    // post processing flag
-    if (m_PostFlag == true)
-    {
-        PostProcessing(src, dst, width, height, stride);
-    }
-    else
-    {
-        //#pragma omp parallel for
-        for (auto j = 0; j < height; j++)
-        {
-            for (auto i = 0; i < width; i++)
-            {
-                // I' = (I - Airlight) / Transmission + Airlight and Gamma correction using Lut
-                const auto pos = (j * width + i) * 3;
-                const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
-
-                dst[pos]     = (T)m_pucGammaLUT[clamp((int)((src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
-                dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)((src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
-                dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)((src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
-            }
-        }
-    }
-}
-
-/*
-    Function: PostProcessing
-    Description: deblocking for blocking artifacts of mpeg video sequence.
-    Parameter:
-        imInput - Input hazy frame.
-    Return:
-        imOutput - Dehazed frame.
- */
-template <typename T>
-void dehazing::PostProcessing(const T* src, T* dst, int width, int height, int stride)
-{
-    const int nNumStep = 10;
-    const int nDisPos = 20;
-
-#pragma omp parallel for private(nAD0, nAD1, nAD1, nS)
     for (auto j = 0; j < height; j++)
     {
         for (auto i = 0; i < width; i++)
         {
             // I' = (I - Airlight) / Transmission + Airlight and Gamma correction using Lut
             const auto pos = (j * width + i) * 3;
-            const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f);
+            const float transmission = clamp(m_pfTransmissionR[j * width + i], 0.f, 1.f); // m_pfTransmissionR calculated in GuideFilter
 
             dst[pos]     = (T)m_pucGammaLUT[clamp((int)((src[pos]     - m_anAirlight[0]) / transmission + m_anAirlight[0]), 0, peak)];
             dst[pos + 1] = (T)m_pucGammaLUT[clamp((int)((src[pos + 1] - m_anAirlight[1]) / transmission + m_anAirlight[1]), 0, peak)];
             dst[pos + 2] = (T)m_pucGammaLUT[clamp((int)((src[pos + 2] - m_anAirlight[2]) / transmission + m_anAirlight[2]), 0, peak)];
+        }
+    }
 
+    // post processing flag
+    if (m_PostFlag == true)
+    {
+        PostProcessing(dst, width, height, stride);
+    }
+}
+
+/*
+    Function: PostProcessing
+    Description: deblocking for blocking artifacts of mpeg video sequence.
+    Return:
+        imOutput - Dehazed frame by post processing.
+ */
+template <typename T>
+void dehazing::PostProcessing(T* dst, int width, int height, int stride)
+{
+    const int nNumStep = 10;
+    const int nDisPos = 20;
+
+    for (auto j = 0; j < height; j++)
+    {
+        for (auto i = 0; i < width; i++)
+        {
             // If transmission is less than 0.4, apply post processing because more dehazed block yields more artifacts
             if (i > nDisPos + nNumStep && m_pfTransmissionR[j * width + i - nDisPos] < 0.4)
             {

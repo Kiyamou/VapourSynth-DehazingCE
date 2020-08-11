@@ -33,7 +33,7 @@ private:
     void TransmissionEstimationColor(const T* pnImageR, const T* pnImageG, const T* pnImageB);
 
     template <typename T>
-    void PostProcessing(const T* src, T* dst, int width, int height, int stride);  // Called by RestoreImage();
+    void PostProcessing(T* dst, int width, int height, int stride);  // Called by RestoreImage();
 
     template <typename T>
     void RestoreImage(const T* src, T* dst, int height, int width, int stride);
