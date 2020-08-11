@@ -146,9 +146,9 @@ void dehazing::PostProcessing(T* dst, int width, int height, int stride)
                 {
                     for (auto nS = 1; nS < nNumStep + 1; nS++)
                     {
-                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     + (float)nS * nAD0 / (float)nNumStep, 0.f, (float)peak);
-                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] + (float)nS * nAD1 / (float)nNumStep, 0.f, (float)peak);
-                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] + (float)nS * nAD2 / (float)nNumStep, 0.f, (float)peak);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3]     + (float)nS * nAD0 / nNumStep, 0.f, (float)peak);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 1] + (float)nS * nAD1 / nNumStep, 0.f, (float)peak);
+                        dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] = (T)clamp((float)dst[(j * width + (i - nDisPos - 1 + nS - nNumStep)) * 3 + 2] + (float)nS * nAD2 / nNumStep, 0.f, (float)peak);
                     }
                 }
             }
@@ -179,29 +179,29 @@ void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG,
 
 
 /*
-	Function: UpsampleImage
-	Description: upsample the fixed sized transmission to original size
+    Function: UpsampleImage
+    Description: upsample the fixed sized transmission to original size
 
-	Parameters:(hidden)
-		m_pfSmallTrans - input transmission (ref clip size)
-	Return:
-		m_pfTransmission - output transmission
+    Parameters:(hidden)
+        m_pfSmallTrans - input transmission (ref clip size)
+    Return:
+        m_pfTransmission - output transmission
 
 */
 void dehazing::UpsampleTransmission()
 {
-	// Upsample ratio
-	float fRatioX = (float)ref_width / width;
-	float fRatioY = (float)ref_height / height;
+    // Upsample ratio
+    float fRatioX = (float)ref_width / width;
+    float fRatioY = (float)ref_height / height;
 
-	for(auto j = 0; j < height; j++)
-	{
-		for(auto i = 0; i < width; i++)
-		{
-			// Upsample variable, from m_pfSmallTrans to m_pfTransmission
-			m_pfTransmission[j * width + i] = m_pfSmallTrans[(int)(j * fRatioY) * ref_width + (int)(i * fRatioX)];
-		}
-	}
+    for(auto j = 0; j < height; j++)
+    {
+        for(auto i = 0; i < width; i++)
+        {
+            // Upsample variable, from m_pfSmallTrans to m_pfTransmission
+            m_pfTransmission[j * width + i] = m_pfSmallTrans[(int)(j * fRatioY) * ref_width + (int)(i * fRatioX)];
+        }
+    }
 }
 
 
