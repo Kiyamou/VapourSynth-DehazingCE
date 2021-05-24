@@ -25,6 +25,6 @@ jobs:
           mkdir build && cd build
           cmake -DVAPOURSYNTH_INCLUDE_DIR=../src ..
           
-      - name: configure
+      - name: build
         run: cmake --build build -j 2
 

@@ -1,6 +1,6 @@
 # VapourSynth-DehazingCE
 
-[![Build Status](https://api.travis-ci.org/Kiyamou/VapourSynth-DehazingCE.svg?branch=master)](https://api.travis-ci.org/Kiyamou/VapourSynth-DehazingCE.svg?branch=master)
+[![Build Status](https://github.com/Kiyamou/VapourSynth-DehazingCE/workflows/CI/badge.svg)](https://github.com/Kiyamou/VapourSynth-DehazingCE/actions)
 
 DehazingCE is a dehazing plugin for VapourSynth, based on contrast enhancement.
 
@@ -61,7 +61,7 @@ res = core.dhce.DehazingCE(src, ref, trans=..., gamma=..., ...)
 | <img width="360" src="https://i.loli.net/2020/06/13/h5jZJoc4KtSeuRn.jpg"> | <img width="360" src="https://i.loli.net/2020/07/30/2bXcZkMaIsy3rzm.jpg"> |
 | <img width="360" src="https://i.loli.net/2020/06/12/rnjvJQdM6a3BZIg.jpg"> | <img width="360" src="https://i.loli.net/2020/06/12/hqgX9veIykwiL1r.jpg"> |
 
-*The first image is from original paper. (Dehazing parameters: ref size: 320 * 240, trans=0.35, gamma=1/0.65)*
+*The first image is from original paper. (Dehazing parameters: ref size: 320 \* 240, trans=0.35, gamma=1/0.65)*
 
 *The second image is from [Wikipedia](https://en.wikipedia.org/wiki/File:20080313_Foggy_Street.jpg). (Dehazing parameters: ref size: same with input, trans=0.3, gamma=1/0.7)*
 
