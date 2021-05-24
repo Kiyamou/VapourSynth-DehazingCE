@@ -1,9 +1,6 @@
-
-
 #include <cmath>
 
-#include "DehazingCE.h"
-
+#include "DehazingCE.hpp"
 
 /*
     Function: MakeExpLUT

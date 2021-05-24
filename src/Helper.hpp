@@ -1,18 +1,14 @@
-
-
 #ifndef HELPER_HPP_
 #define HELPER_HPP_
 
 #include <cmath>
 #include <algorithm>
 
-
 template <typename T>
 inline T clamp(T input, T range_min, T range_max)
 {
     return std::min(std::max(input, range_min), range_max);
 }
-
 
 // Modified from https://blog.csdn.net/fengbingchun/article/details/73323475
 template <typename T>

@@ -1,6 +1,4 @@
-
-
-#include "DehazingCE.h"
+#include "DehazingCE.hpp"
 
 /*
     Function: CalcAcoeff (called after Boxfilter)

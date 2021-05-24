@@ -1,6 +1,4 @@
-
-
-#include "DehazingCE.h"
+#include "DehazingCE.hpp"
 #include "Helper.hpp"
 
 constexpr float SQRT_3 = 1.733f;
@@ -64,7 +62,6 @@ dehazing::~dehazing()
 
     delete[] m_pfGuidedLUT;
 }
-
 
 template <typename T>
 void dehazing::RemoveHaze(const T* src, const T* refpB, const T* refpG, const T* refpR, T* dst, int stride)
@@ -177,7 +174,6 @@ void dehazing::TransmissionEstimationColor(const T* pnImageB, const T* pnImageG,
     }
 }
 
-
 /*
     Function: UpsampleImage
     Description: upsample the fixed sized transmission to original size
@@ -203,7 +199,6 @@ void dehazing::UpsampleTransmission()
         }
     }
 }
-
 
 /*
     Function: NFTrsEstimation
@@ -301,7 +296,6 @@ float dehazing::NFTrsEstimationColor(const T* pnImageB, const T* pnImageG, const
     }
     return fOptTrs;
 }
-
 
 /*
     Function: AirlightEstimation

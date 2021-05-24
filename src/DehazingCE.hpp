@@ -1,11 +1,8 @@
-
-
 #ifndef DEHAZINGCE_H_
 #define DEHAZINGCE_H_
 
 #include "vapoursynth/VapourSynth.h"
 #include "vapoursynth/VSHelper.h"
-
 
 class dehazing
 {

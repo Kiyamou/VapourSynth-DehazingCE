@@ -1,9 +1,7 @@
-
-
 #include <memory>
 #include <string>
 
-#include "DehazingCE.h"
+#include "DehazingCE.hpp"
 #include "DehazingCE.cpp"
 
 struct FilterData
