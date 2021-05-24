@@ -57,7 +57,6 @@ void dehazing::GuideLUTMaker()
         fParameter - gamma value.
     Return:
         m_pucGammaLUT - output table
-
 */
 void dehazing::GammaLUTMaker(float fParameter)
 {

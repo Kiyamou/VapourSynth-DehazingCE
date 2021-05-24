@@ -27,7 +27,7 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
     int height = vsapi->getFrameHeight(src, 0);
     int stride = vsapi->getStride(dst, 0) / sizeof(T);
 
-    //// Convert RGB to 1-D ararry ////
+    // Convert RGB to 1-D ararry
     const T* srcpR = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 0));
     const T* srcpG = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 1));
     const T* srcpB = reinterpret_cast<const T*>(vsapi->getReadPtr(src, 2));
@@ -56,7 +56,7 @@ static void process(const VSFrameRef* src, const VSFrameRef* ref, VSFrameRef* ds
 
     d->dehazing_clip->RemoveHaze((const T*)srcInterleaved, refpB, refpG, refpR, dstInterleaved, stride);
 
-    //// change back from Interleaved
+    // Change back from Interleaved
     T* VS_RESTRICT dstpR = reinterpret_cast<T*>(vsapi->getWritePtr(dst, 0));
     T* VS_RESTRICT dstpG = reinterpret_cast<T*>(vsapi->getWritePtr(dst, 1));
     T* VS_RESTRICT dstpB = reinterpret_cast<T*>(vsapi->getWritePtr(dst, 2));
@@ -140,7 +140,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
             (d->vi->format->sampleType == stInteger && d->vi->format->bitsPerSample > 16))
             throw std::string{ "only constant format RGB 8-16 bit integer input supported" };
 
-        // donwscale clip for Trans Estimation
+        // Donwscale clip for trans estimation
         d->rnode = vsapi->propGetNode(in, "ref", 0, &err);
 
         if (err)
@@ -154,7 +154,7 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
             d->rdef = true;
             d->rvi = vsapi->getVideoInfo(d->rnode);
 
-            // the scale of width and height of ref should be same with src
+            // Scale of width and height of ref should be same with src
             if (!isConstantFormat(d->rvi))
                 throw std::string("Invalid clip \"ref\", only constant format input supported");
             if (d->rvi->format != d->vi->format)
@@ -196,8 +196,8 @@ static void VS_CC filterCreate(const VSMap* in, VSMap* out, void* userData, VSCo
 
         d->dehazing_clip = new dehazing(width, height, ref_width, ref_height, bits, ABlockSize, TBlockSize, TransInit, false, PostFlag, lamdaA, 1.f, GBlockSize);
 
-        //d->dehazing_clip->MakeExpLUT(); // called in NFTrsEstimationPColor(), NFTrsEstimationP()
-        //d->dehazing_clip->GuideLUTMaker(); // called in FastGuideFilter()
+        //d->dehazing_clip->MakeExpLUT();    // Called in NFTrsEstimationPColor(), NFTrsEstimationP()
+        //d->dehazing_clip->GuideLUTMaker(); // Called in FastGuideFilter()
         d->dehazing_clip->GammaLUTMaker(gamma);
     }
     catch (const std::string & error)

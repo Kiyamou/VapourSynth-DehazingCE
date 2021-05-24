@@ -41,7 +41,6 @@ void dehazing::CalcAcoeff(float* pfSigma, float* pfCov, float* pfA1, float* pfA2
     pfA3[nIdx] = pfCov[nIdx3] * pfInvSig[2] + pfCov[nIdx3 + 1] * pfInvSig[5] + pfCov[nIdx3 + 2] * pfInvSig[8];
 }
 
-
 /*
     Function: BoxFilter
     Description: cummulative function for calculating the integral image (It may apply other arraies.)
@@ -57,14 +56,14 @@ void dehazing::BoxFilter(float* pfInArray, int nR, int width, int height, float*
 {
     float* pfArrayCum = new float[width * height];
 
-    //cumulative sum over Y axis
+    // Cumulative sum over Y axis
     for (auto i = 0; i < width; i++)
         pfArrayCum[i] = pfInArray[i];
 
     for (int nIdx = width; nIdx < width * height; nIdx++)
         pfArrayCum[nIdx] = pfArrayCum[nIdx - width] + pfInArray[nIdx];
 
-    //difference over Y axis
+    // Difference over Y axis
     for (int nIdx = 0; nIdx < width * (nR + 1); nIdx++)
         fOutArray[nIdx] = pfArrayCum[nIdx + nR * width];
 
@@ -75,7 +74,7 @@ void dehazing::BoxFilter(float* pfInArray, int nR, int width, int height, float*
         for (auto i = 0; i < width; i++)
             fOutArray[j * width + i] = pfArrayCum[(height - 1) * width + i] - pfArrayCum[(j - nR - 1) * width + i];
 
-    //cumulative sum over X axis
+    // Cumulative sum over X axis
     for (int nIdx = 0; nIdx < width * height; nIdx += width)
         pfArrayCum[nIdx] = fOutArray[nIdx];
 
@@ -83,7 +82,7 @@ void dehazing::BoxFilter(float* pfInArray, int nR, int width, int height, float*
         for (auto i = 1; i < width; i++)
             pfArrayCum[j + i] = pfArrayCum[j + i - 1] + fOutArray[j + i];
 
-    //difference over Y axis
+    // Difference over Y axis
     for (auto j = 0; j < width * height; j += width)
         for (auto i = 0; i < nR + 1; i++)
             fOutArray[j + i] = pfArrayCum[j + i + nR];
@@ -120,7 +119,7 @@ void dehazing::BoxFilter(float* pfInArray1, float* pfInArray2, float* pfInArray3
     float* pfArrayCum2 = new float[width * height];
     float* pfArrayCum3 = new float[width * height];
 
-    //cumulative sum over Y axis
+    // Cumulative sum over Y axis
     for (auto i = 0; i < width; i++)
     {
         pfArrayCum1[i] = pfInArray1[i];
@@ -135,7 +134,7 @@ void dehazing::BoxFilter(float* pfInArray1, float* pfInArray2, float* pfInArray3
         pfArrayCum3[nIdx] = pfArrayCum3[nIdx - width] + pfInArray3[nIdx];
     }
 
-    //difference over Y axis
+    // Difference over Y axis
     for (auto nIdx = 0; nIdx < (nR + 1) * width; nIdx++)
     {
         pfOutArray1[nIdx] = pfArrayCum1[nIdx + nR * width];
@@ -213,8 +212,6 @@ void dehazing::BoxFilter(float* pfInArray1, float* pfInArray2, float* pfInArray3
     delete[] pfArrayCum2;
     delete[] pfArrayCum3;
 }
-
-
 
 /*
 	Function: GuidedFilter
@@ -307,8 +304,7 @@ void dehazing::GuidedFilter(int width, int height, float fEps)
 
     BoxFilter(pfInitMeanIpR, pfInitMeanIpG, pfInitMeanIpB, GBlockSize, width, height, pfMeanIpR, pfMeanIpG, pfMeanIpB);
 
-    //Covariance of (I, pfTrans) in each local patch
-
+    // Covariance of (I, pfTrans) in each local patch
     for (auto nIdx = 0; nIdx < width * height; nIdx++)
     {
         pfMeanIr[nIdx] = pfMeanIr[nIdx] / pfN[nIdx];

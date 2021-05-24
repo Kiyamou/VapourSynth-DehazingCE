@@ -1,5 +1,5 @@
-#ifndef DEHAZINGCE_H_
-#define DEHAZINGCE_H_
+#ifndef DEHAZINGCE_HPP_
+#define DEHAZINGCE_HPP_
 
 #include "vapoursynth/VapourSynth.h"
 #include "vapoursynth/VSHelper.h"
@@ -68,7 +68,7 @@ private:
     int m_nBottomRightY;
 
     bool m_PreviousFlag;
-    bool m_PostFlag;  // Flag for post processing(deblocking)
+    bool m_PostFlag;           // Flag for post processing (deblocking)
 
     double Lambda1;
     float Lambda2;
@@ -82,8 +82,8 @@ private:
     int* m_pnGImg;
     int* m_pnBImg;
 
-    float* m_pfTransmission;   // preliminary transmission
-    float* m_pfTransmissionR;  // refined transmission
+    float* m_pfTransmission;   // Preliminary transmission
+    float* m_pfTransmissionR;  // Refined transmission
     float* m_pfSmallTrans;
 
     float ExpLUT[65536];

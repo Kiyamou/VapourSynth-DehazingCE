@@ -19,7 +19,7 @@ dehazing::dehazing(int nW, int nH, int n_refW, int n_refH, int nBits, int nABloc
 
     // Parameters for each cost (loss cost, temporal coherence cost)
     Lambda1 = dL1;
-    Lambda2 = fL2;  // only used in previous mode
+    Lambda2 = fL2;  // Only used in previous mode
 
     // Block size for transmission estimation
     TBlockSize = nTBlockSize;
@@ -100,7 +100,7 @@ void dehazing::RestoreImage(const T* src, T* dst, int width, int height, int str
         }
     }
 
-    // post processing flag
+    // Post processing flag
     if (m_PostFlag == true)
     {
         PostProcessing(dst, width, height, stride);
@@ -190,9 +190,9 @@ void dehazing::UpsampleTransmission()
     float fRatioX = (float)ref_width / width;
     float fRatioY = (float)ref_height / height;
 
-    for(auto j = 0; j < height; j++)
+    for (auto j = 0; j < height; j++)
     {
-        for(auto i = 0; i < width; i++)
+        for (auto i = 0; i < width; i++)
         {
             // Upsample variable, from m_pfSmallTrans to m_pfTransmission
             m_pfTransmission[j * width + i] = m_pfSmallTrans[(int)(j * fRatioY) * ref_width + (int)(i * fRatioX)];
@@ -342,13 +342,13 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
 
     if (_width * _height > ABlockSize)
     {
-        // compute the mean and std-dev in the sub-block
+        // Compute the mean and std-dev in the sub-block
         T* iplR = new T[half_h * half_w + 1];
         T* iplG = new T[half_h * half_w + 1];
         T* iplB = new T[half_h * half_w + 1];
 
         //////////////////////////////////
-        // upper left sub-block
+        // Upper left sub-block
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -382,7 +382,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-        // upper right sub-block
+        // Upper right sub-block
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -419,7 +419,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-        // lower left sub-block
+        // Lower left sub-block
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -456,7 +456,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
         iplG -= half_h * half_w;
         iplR -= half_h * half_w;
 
-        // lower right sub-block
+        // Lower right sub-block
         for (auto j = 0; j < half_h; j++)
         {
             for (auto i = 0; i < half_w; i++)
@@ -488,7 +488,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
             nMaxIndex = 3;
         }
 
-        // select the sub-block, which has maximum score
+        // Select the sub-block, which has maximum score
         switch (nMaxIndex)
         {
         case 0:
@@ -511,7 +511,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
     }
     else
     {
-        // select the atmospheric light value in the sub-block
+        // Select the atmospheric light value in the sub-block
         for (auto j = 0; j < _height; j++)
         {
             for (auto i = 0; i < _width; i++)
@@ -523,7 +523,7 @@ void dehazing::AirlightEstimation(const T* src, int _width, int _height, int str
                                                (float)(peak - src[pos + 2]) * (peak - src[pos + 2]));
                 if (nMinDistance > nDistance)
                 {
-                    // atmospheric light value
+                    // Atmospheric light value
                     nMinDistance = nDistance;
                     m_anAirlight[0] = src[pos];
                     m_anAirlight[1] = src[pos + 1];
