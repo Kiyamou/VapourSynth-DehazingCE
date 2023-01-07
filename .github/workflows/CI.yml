@@ -44,6 +44,15 @@ jobs:
       - name: build
         run: cmake --build build -j 2
 
+      - name: strip
+        run: strip build/libDehazingCE.so
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-vapoursynth-dehazingce
+          path: build/libDehazingCE.so
+
   build-windows:
 
     runs-on: windows-latest
@@ -66,3 +75,12 @@ jobs:
 
       - name: build
         run: cmake --build build -j 2
+
+      - name: strip
+        run: strip build/Debug/DehazingCE.dll
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-vapoursynth-dehazingce
+          path: build/Debug/DehazingCE.dll
