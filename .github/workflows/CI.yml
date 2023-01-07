@@ -19,11 +19,13 @@ on:
       - '**/LICENSE'
       - '**.md'
 
+  # Manual trigger
+  workflow_dispatch:
+
 env:
   VAPOURSYNTH_VERSION: R61
 
 jobs:
-
   build-linux:
 
     runs-on: ubuntu-latest
@@ -40,7 +42,7 @@ jobs:
           mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VSHelper.h src/vapoursynth/VSHelper.h
           mkdir build && cd build
           cmake -DVAPOURSYNTH_INCLUDE_DIR=../src ..
-          
+
       - name: build
         run: cmake --build build -j 2
 
