@@ -19,6 +19,9 @@ on:
       - '**/LICENSE'
       - '**.md'
 
+env:
+  VAPOURSYNTH_VERSION: R53
+
 jobs:
 
   build:
@@ -30,11 +33,11 @@ jobs:
 
       - name: configure
         run: |
-          wget https://github.com/vapoursynth/vapoursynth/archive/refs/tags/R53.tar.gz
-          tar -xzvf R53.tar.gz vapoursynth-R53/include
+          wget https://github.com/vapoursynth/vapoursynth/archive/refs/tags/${{env.VAPOURSYNTH_VERSION}}.tar.gz
+          tar -xzvf ${{env.VAPOURSYNTH_VERSION}}.tar.gz vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include
           mkdir src/vapoursynth
-          mv vapoursynth-R53/include/VapourSynth.h src/vapoursynth/VapourSynth.h
-          mv vapoursynth-R53/include/VSHelper.h src/vapoursynth/VSHelper.h
+          mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VapourSynth.h src/vapoursynth/VapourSynth.h
+          mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VSHelper.h src/vapoursynth/VSHelper.h
           mkdir build && cd build
           cmake -DVAPOURSYNTH_INCLUDE_DIR=../src ..
           
