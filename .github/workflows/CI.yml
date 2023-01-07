@@ -3,28 +3,86 @@ name: CI
 on:
   push:
     branches: [ master ]
+    paths-ignore:
+      - '.gitignore'
+      - '.gitattributes'
+      - '.gitmodules'
+      - '**/LICENSE'
+      - '**.md'
+
   pull_request:
     branches: [ master ]
+    paths-ignore:
+      - '.gitignore'
+      - '.gitattributes'
+      - '.gitmodules'
+      - '**/LICENSE'
+      - '**.md'
+
+  # Manual trigger
+  workflow_dispatch:
+
+env:
+  VAPOURSYNTH_VERSION: R61
 
 jobs:
-
-  build:
+  build-linux:
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: configure
         run: |
-          wget https://github.com/vapoursynth/vapoursynth/archive/refs/tags/R53.tar.gz
-          tar -xzvf R53.tar.gz vapoursynth-R53/include
+          wget https://github.com/vapoursynth/vapoursynth/archive/refs/tags/${{env.VAPOURSYNTH_VERSION}}.tar.gz
+          tar -xzvf ${{env.VAPOURSYNTH_VERSION}}.tar.gz vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include
           mkdir src/vapoursynth
-          mv vapoursynth-R53/include/VapourSynth.h src/vapoursynth/VapourSynth.h
-          mv vapoursynth-R53/include/VSHelper.h src/vapoursynth/VSHelper.h
+          mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VapourSynth.h src/vapoursynth/VapourSynth.h
+          mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VSHelper.h src/vapoursynth/VSHelper.h
           mkdir build && cd build
           cmake -DVAPOURSYNTH_INCLUDE_DIR=../src ..
-          
+
       - name: build
         run: cmake --build build -j 2
 
+      - name: strip
+        run: strip build/libDehazingCE.so
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-vapoursynth-dehazingce
+          path: build/libDehazingCE.so
+
+  build-windows:
+
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: configure
+        run:  |
+          curl -s -L https://github.com/vapoursynth/vapoursynth/archive/refs/tags/${{env.VAPOURSYNTH_VERSION}}.tar.gz -o ${{env.VAPOURSYNTH_VERSION}}.tar.gz
+          tar -xzvf ${{env.VAPOURSYNTH_VERSION}}.tar.gz vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include
+          mkdir "C:/Program Files/VapourSynth/sdk/include/vapoursynth"
+          mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VapourSynth.h "C:/Program Files/VapourSynth/sdk/include/vapoursynth/VapourSynth.h"
+          mv vapoursynth-${{env.VAPOURSYNTH_VERSION}}/include/VSHelper.h "C:/Program Files/VapourSynth/sdk/include/vapoursynth/VSHelper.h"
+          mkdir "src/vapoursynth"
+          cp "C:/Program Files/VapourSynth/sdk/include/vapoursynth/VapourSynth.h" "src/vapoursynth/VapourSynth.h"
+          cp "C:/Program Files/VapourSynth/sdk/include/vapoursynth/VSHelper.h" "src/vapoursynth/VSHelper.h"
+          mkdir build && cd build
+          cmake ..
+
+      - name: build
+        run: cmake --build build -j 2
+
+      - name: strip
+        run: strip build/Debug/DehazingCE.dll
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-vapoursynth-dehazingce
+          path: build/Debug/DehazingCE.dll
